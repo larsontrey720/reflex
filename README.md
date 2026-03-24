@@ -137,7 +137,7 @@ reflex graph --format mermaid > graph.md
 
 ## Ways to Import Your Code
 
-### 2. CLI — Local Project or GitHub URL (All Users)
+### 1. CLI — Local Project or GitHub URL (All Users)
 ```bash
 # Local project
 reflex introspect --project ./my-app
@@ -152,14 +152,14 @@ reflex introspect --project username/repo
 ```
 Best for: Private repos, local development, CI/CD, remote analysis.
 
-### 3. CLI — Natural Language (Beginners)
+### 2. CLI — Natural Language (Beginners)
 ```bash
 reflex ask "check my code in this folder"
 reflex ask "fix the problems"
 ```
 Just describe what you want. No flags, no commands to memorize.
 
-### 4. GitHub Webhook (Teams)
+### 3. GitHub Webhook (Teams)
 Connect your repo → Automatic PR analysis.
 See: [GitHub App Setup](#github-app--pr-quality-checks)
 
