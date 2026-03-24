@@ -166,16 +166,16 @@ Configure your own LLM:
 # OpenAI
 export REFLEX_LLM_PROVIDER=openai
 export REFLEX_LLM_API_KEY=sk-xxx
-export REFLEX_LLM_MODEL=gpt-4o
+export REFLEX_LLM_MODEL=gpt-5.4
 
 # Anthropic
 export REFLEX_LLM_PROVIDER=anthropic
 export REFLEX_LLM_API_KEY=sk-ant-xxx
-export REFLEX_LLM_MODEL=claude-3-5-sonnet-20241022
+export REFLEX_LLM_MODEL=claude-opus-4-6
 
 # Ollama (local)
 export REFLEX_LLM_PROVIDER=ollama
-export REFLEX_LLM_MODEL=qwen2.5:7b
+export REFLEX_LLM_MODEL=qwen3.5:27b
 
 # Custom endpoint
 export REFLEX_LLM_PROVIDER=custom

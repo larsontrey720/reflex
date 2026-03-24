@@ -1,110 +1,104 @@
 # LLM Configuration Guide
 
-Codeboros supports multiple LLM providers through a unified interface.
+Reflex supports multiple LLM providers through a unified interface.
 
 ## Quick Setup
 
 ### Option 1: Zo Computer (Native)
 
-When running inside Zo Computer, the system automatically uses Zo's internal API:
+When running inside Zo Computer, the system automatically uses the native `/zo/ask` API. No configuration needed.
+
+### Option 2: BYO-Model (Any Environment)
+
+Set environment variables for your provider:
+
+## Provider Examples
+
+### OpenAI
 
 ```bash
-# No configuration needed - uses your current model
-export CODEBOROS_LLM_PROVIDER=zo
+# GPT-5.4 (Latest flagship - March 2026)
+export REFLEX_LLM_PROVIDER=openai
+export REFLEX_LLM_API_KEY=sk-xxx
+export REFLEX_LLM_MODEL=gpt-5.4
+
+# GPT-5.4 Pro (Enhanced reasoning)
+export REFLEX_LLM_MODEL=gpt-5.4-pro
+
+# GPT-5.4 Thinking (Extended reasoning chain)
+export REFLEX_LLM_MODEL=gpt-5.4-thinking
+
+# GPT-5.4 mini (Fast, efficient)
+export REFLEX_LLM_MODEL=gpt-5.4-mini
+
+# GPT-5.4 nano (Ultra-fast, lightweight)
+export REFLEX_LLM_MODEL=gpt-5.4-nano
+
+# GPT-5.3-Codex (Specialized coding model)
+export REFLEX_LLM_MODEL=gpt-5.3-codex
 ```
 
-The `ZO_CLIENT_IDENTITY_TOKEN` is automatically available in Zo's environment.
-
-### Option 2: OpenAI / OpenAI-Compatible
+### Anthropic
 
 ```bash
-export CODEBOROS_LLM_PROVIDER=openai
-export CODEBOROS_LLM_API_KEY=sk-...
-export CODEBOROS_LLM_MODEL=gpt-4o
+# Claude Opus 4.6 (Flagship - February 2026)
+export REFLEX_LLM_PROVIDER=anthropic
+export REFLEX_LLM_API_KEY=sk-ant-xxx
+export REFLEX_LLM_MODEL=claude-opus-4-6
 
-# Or use a custom endpoint (Together, Groq, Cerebras, etc.)
-export CODEBOROS_LLM_ENDPOINT=https://api.together.xyz/v1
-export CODEBOROS_LLM_MODEL=meta-llama/Llama-3-70b-chat-hf
+# Claude Sonnet 4.6 (Balanced performance)
+export REFLEX_LLM_MODEL=claude-sonnet-4-6
+
+# Claude Code (Optimized for coding tasks)
+export REFLEX_LLM_MODEL=claude-code
 ```
 
-### Option 3: Anthropic Claude
+### Ollama (Local)
 
 ```bash
-export CODEBOROS_LLM_PROVIDER=anthropic
-export CODEBOROS_LLM_API_KEY=sk-ant-...
-export CODEBOROS_LLM_MODEL=claude-sonnet-4-20250514
+# Qwen 3.5 Series (March 2026)
+export REFLEX_LLM_PROVIDER=ollama
+export REFLEX_LLM_MODEL=qwen3.5:9b      # Small, runs on laptop
+export REFLEX_LLM_MODEL=qwen3.5:27b     # Medium
+export REFLEX_LLM_MODEL=qwen3.5:35b     # Medium-large
+export REFLEX_LLM_MODEL=qwen3.5:122b    # Large
+
+# Other local options
+export REFLEX_LLM_MODEL=llama3.3:70b
+export REFLEX_LLM_MODEL=deepseek-r1:32b
 ```
 
-### Option 4: Ollama (Local)
+### Custom Endpoint (OpenAI-Compatible)
 
 ```bash
-export CODEBOROS_LLM_PROVIDER=ollama
-export CODEBOROS_LLM_MODEL=qwen2.5:7b
-
-# Optional: custom endpoint
-export OLLAMA_HOST=http://localhost:11434
+export REFLEX_LLM_PROVIDER=custom
+export REFLEX_LLM_ENDPOINT=https://my-api.com/v1
+export REFLEX_LLM_API_KEY=xxx
+export REFLEX_LLM_MODEL=my-model-name
 ```
 
-## Environment Variables Reference
+## Model Selection Guide
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `CODEBOROS_LLM_PROVIDER` | `openai` | Provider: `openai`, `anthropic`, `ollama`, `zo` |
-| `CODEBOROS_LLM_API_KEY` | - | API key for external providers |
-| `CODEBOROS_LLM_MODEL` | `gpt-4o` | Model identifier |
-| `CODEBOROS_LLM_ENDPOINT` | OpenAI API | Custom OpenAI-compatible endpoint |
-| `CODEBOROS_LLM_MAX_TOKENS` | `4096` | Max generation tokens |
-| `CODEBOROS_LLM_TEMPERATURE` | `0.2` | Generation temperature (low for code) |
+| Use Case | Recommended Model |
+|----------|-------------------|
+| Complex refactoring | Claude Opus 4.6, GPT-5.4 Pro |
+| Fast fixes at scale | GPT-5.4 nano, Qwen 3.5 9B |
+| Local/air-gapped | Qwen 3.5 27B (Ollama) |
+| Budget-conscious | GPT-5.4 mini, Qwen 3.5 9B |
+| Maximum quality | Claude Opus 4.6 |
 
-### Zo-Specific
+## Configuration Priority
 
-| Variable | Description |
-|----------|-------------|
-| `ZO_CLIENT_IDENTITY_TOKEN` | Auto-set in Zo environment |
-| `CODEBOROS_ZO_MODEL` | Model for Zo API (default: your current model) |
+1. Zo native (`/zo/ask`) — auto-detected if `ZO_CLIENT_IDENTITY_TOKEN` exists
+2. Environment variables (`REFLEX_LLM_*`)
+3. `.env` file in project root
 
-## Testing Configuration
+## Testing Connection
 
 ```bash
-# Check current config
-bun Skills/codeboros-evolve/lib/llm-client.ts --config
+# Verify your LLM is configured
+reflex config --check
 
-# Test connection
-bun Skills/codeboros-evolve/lib/llm-client.ts --test
-
-# Send a prompt
-bun Skills/codeboros-evolve/lib/llm-client.ts --prompt "Write a TypeScript hello world"
+# Test a simple query
+reflex config --test
 ```
-
-## Provider Comparison
-
-| Provider | Speed | Cost | Code Quality | Privacy |
-|----------|-------|------|--------------|---------|
-| **GPT-4o** | Fast | $$ | Excellent | Cloud |
-| **Claude Sonnet** | Fast | $$ | Excellent | Cloud |
-| **Together/Groq** | Very fast | $ | Good | Cloud |
-| **Ollama (local)** | Depends on hardware | Free | Good | Local |
-| **Zo API** | Medium | Included | Good | Cloud |
-
-## Recommended Models by Task
-
-| Task | Recommended Model | Why |
-|------|-------------------|-----|
-| **Type safety fixes** | Claude Sonnet | Best at understanding TypeScript nuances |
-| **Test generation** | GPT-4o | Fast, good at boilerplate |
-| **Complexity reduction** | Claude Sonnet | Better at refactoring logic |
-| **Dependency updates** | GPT-4o | Good at API migrations |
-| **Quick iterations** | Ollama qwen2.5:7b | Free, runs locally |
-
-## Cost Estimation
-
-Assuming 1000 fix attempts per month, ~500 tokens each:
-
-| Provider | Monthly Cost |
-|----------|--------------|
-| GPT-4o | ~$5 |
-| Claude Sonnet | ~$4 |
-| Together (Llama-3-70B) | ~$1 |
-| Groq (Llama-3-70B) | Free tier |
-| Ollama | Free |
-| Zo API | Included |
