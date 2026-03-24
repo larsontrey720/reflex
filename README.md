@@ -6,6 +6,8 @@ Reflex is a self-enhancing code quality system. It measures 10 code health metri
 
 Your code fixes itself on reflex.
 
+![Reflex Logo](reflex-logo.svg)
+
 ![Reflex Pipeline](reflex-diagram.png)
 
 ---
