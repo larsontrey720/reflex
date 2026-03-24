@@ -1,0 +1,3 @@
+#!/bin/bash
+# Reflex CLI wrapper
+cd "$(dirname "$0")" && bun cli/index.ts "$@"
