@@ -377,3 +377,79 @@ Built for [Zo Computer](https://zocomputer.com).
 ## License
 
 MIT
+
+---
+
+## GitHub Integration
+
+Reflex can automatically analyze your pull requests and post quality scorecards as PR comments.
+
+### Quick Setup (2 minutes)
+
+1. **Create a webhook in your repo**
+   - Go to: Your Repo → Settings → Webhooks → Add webhook
+   - **Payload URL**: `https://georgeo.zo.space/api/reflex-webhook`
+   - **Content type**: `application/json`
+   - **Secret**: Generate a random string (save this)
+   - **Events**: Check "Pull requests"
+   - Click "Add webhook"
+
+2. **Create a GitHub token**
+   - Go to: Settings → Developer settings → Personal access tokens → Fine-grained tokens
+   - **Permissions**: Contents (Read), Pull requests (Read and Write), Metadata (Read)
+   - Generate and save the token
+
+3. **Configure secrets in Zo**
+   - Go to [Settings → Advanced](/?t=settings&s=advanced)
+   - Add:
+     ```
+     REFLEX_GITHUB_WEBHOOK_SECRET=your-webhook-secret
+     REFLEX_GITHUB_APP_TOKEN=your-personal-access-token
+     ```
+
+4. **Open a pull request**
+   - Create a PR in your repo
+   - Reflex will automatically post a quality scorecard comment
+
+### Example PR Comment
+
+```markdown
+## ⚡ Reflex Quality Check
+
+**Score: 78/100** (+6)
+
+| Metric | Value | Status |
+|--------|-------|--------|
+| Type Integrity | 89% | ✓ |
+| Test Coverage | 72% | ⚠ |
+| Code Complexity | 12 avg | ✓ |
+| Security Posture | 0 issues | ✓ |
+| Dependency Health | 100% | ✓ |
+| Code Consistency | 94% | ✓ |
+| Build Performance | 1.2s | ✓ |
+| Documentation Health | 67% | ⚠ |
+| Error Handling | 85% | ✓ |
+| Architectural Health | 78% | ⚠ |
+
+---
+_Powered by [Reflex](https://github.com/larsontrey720/reflex)_
+```
+
+### Webhook Endpoint
+
+**URL**: `https://georgeo.zo.space/api/reflex-webhook`
+
+**Events handled**:
+- `pull_request.opened`
+- `pull_request.synchronize` (new commits)
+- `pull_request.reopened`
+
+**Response**:
+```json
+{
+  "status": "success",
+  "score": 78,
+  "pr": 42
+}
+```
+
