@@ -175,6 +175,34 @@ export async function testConnection(): Promise<{ success: boolean; message: str
   }
 }
 
+// Generate a fix for a code issue
+export async function generateFix(
+  issue: { file: string; line: number; message: string; code?: string },
+  context?: { surroundingCode?: string }
+): Promise<{ fix: string; explanation: string }> {
+  const prompt = `You are a code fixer. Fix the following issue:
+
+File: ${issue.file}
+Line: ${issue.line}
+Issue: ${issue.message}
+${issue.code ? `Code: ${issue.code}` : ""}
+${context?.surroundingCode ? `Context: ${context.surroundingCode}` : ""}
+
+Respond in this exact format:
+FIX: <the corrected code>
+EXPLANATION: <brief explanation of the fix>`;
+
+  const response = await callLLM(prompt);
+  
+  const fixMatch = response.match(/FIX:\s*([\s\S]*?)(?=EXPLANATION:|$)/i);
+  const explanationMatch = response.match(/EXPLANATION:\s*([\s\S]*?)$/i);
+  
+  return {
+    fix: fixMatch?.[1]?.trim() || response,
+    explanation: explanationMatch?.[1]?.trim() || "No explanation provided",
+  };
+}
+
 // CLI interface
 if (import.meta.main) {
   const { values } = parseArgs({

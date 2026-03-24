@@ -28,7 +28,7 @@ function runScript(skill: string, script: string, args: string[]): { stdout: str
   return {
     stdout: result.stdout || "",
     stderr: result.stderr || "",
-    exitCode: result.status || 1,
+    exitCode: result.status ?? 1,
   };
 }
 
@@ -121,8 +121,8 @@ while (cycleCount < maxCycles && improved) {
     break;
   }
   
-  console.log(`Composite score: ${scorecard.composite}/100`);
-  console.log(`Weakest metric: ${scorecard.weakest}`);
+  console.log(`Composite score: ${scorecard.compositeScore}/100`);
+  console.log(`Weakest metric: ${scorecard.weakestMetric}`);
   
   // Check if we're already at target
   if (scorecard.composite >= 95) {
@@ -154,7 +154,7 @@ while (cycleCount < maxCycles && improved) {
     break;
   }
   
-  console.log(`Playbook: ${prescription.playbook.id} - ${prescription.playbook.name}`);
+  console.log(`Playbook: ${prescription.playbook} - ${prescription.playbookName}`);
   console.log(`Auto-approve: ${prescription.autoApprove ? "Yes" : "No"}`);
   
   if (!prescription.autoApprove && !dryRun) {
@@ -170,10 +170,10 @@ while (cycleCount < maxCycles && improved) {
   
   if (dryRun) {
     console.log("Dry run: Skipping execution");
-    console.log("\nProposed steps:");
-    prescription.playbook.steps.forEach((step: string, i: number) => {
-      console.log(`  ${i + 1}. ${step}`);
-    });
+    console.log("\nProposed fix:");
+    console.log(`  Playbook: ${prescription.playbookName}`);
+    console.log(`  Target: ${prescription.goal}`);
+    console.log(`  Files: ${prescription.targetFiles.join(", ")}`);
     improved = false;
   } else {
     const evolveResult = runScript("reflex-evolve", "evolve.ts", [
@@ -211,10 +211,10 @@ while (cycleCount < maxCycles && improved) {
       break;
     }
     
-    const delta = verifyScorecard.composite - scorecard.composite;
+    const delta = verifyScorecard.compositeScore - scorecard.compositeScore;
     
-    console.log(`Previous score: ${scorecard.composite}`);
-    console.log(`New score: ${verifyScorecard.composite}`);
+    console.log(`Previous score: ${scorecard.compositeScore}`);
+    console.log(`New score: ${verifyScorecard.compositeScore}`);
     console.log(`Delta: ${delta >= 0 ? "+" : ""}${delta}`);
     
     if (delta < -2) {

@@ -11,6 +11,8 @@ const { values } = parseArgs({
   options: {
     scorecard: { type: "string" },
     "seeds-dir": { type: "string" },
+    output: { type: "string" },
+    json: { type: "boolean", default: false },
     "list-playbooks": { type: "boolean", default: false },
     help: { type: "boolean", short: "h", default: false },
   },
@@ -27,6 +29,8 @@ Usage:
 Options:
   --scorecard <file>       Path to introspection JSON output
   --seeds-dir <dir>        Directory for prescription output
+  --output <file>          Output prescription JSON to file
+  --json                   Output as JSON (to stdout)
   --list-playbooks         List all available playbooks
   -h, --help               Show this help
 `);
@@ -139,6 +143,23 @@ async function main() {
 
   const playbook = PLAYBOOKS[playbookId];
   const seedSpec = generateSeedSpec(weakestMetric, playbookId, scorecard);
+
+  // JSON output mode
+  if (values.json) {
+    console.log(JSON.stringify(seedSpec, null, 2));
+    
+    // Also save to file if --output specified
+    if (values.output) {
+      writeFileSync(values.output as string, JSON.stringify(seedSpec, null, 2));
+    } else {
+      // Still save to seeds dir
+      const seedsDir = (values["seeds-dir"] as string) || process.env.REFLEX_SEEDS_DIR || resolve(process.env.HOME || "/root", "Seeds/reflex");
+      mkdirSync(seedsDir, { recursive: true });
+      const outputPath = resolve(seedsDir, seedSpec.id + ".json");
+      writeFileSync(outputPath, JSON.stringify(seedSpec, null, 2));
+    }
+    process.exit(0);
+  }
 
   // Output
   console.log("\n========================================");
