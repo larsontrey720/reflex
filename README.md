@@ -22,68 +22,100 @@ Code reviews catch symptoms, not root causes. Linters flag violations but can't 
 
 ## For Beginners — No Commands Needed
 
-Don't want to memorize commands? You don't have to.
-
-### Natural Language Mode
-
-Just say what you want:
-
-```bash
-reflex ask "check my code"
-reflex ask "fix the problems"
-reflex ask "what needs work"
-reflex ask "explain type integrity"
-reflex ask "how do I improve tests"
-```
-
-Reflex understands plain English. No flags, no syntax, just talk to it.
-
-### One-Click Fix
-
-```bash
-reflex fix
-```
-
-That's it. Analyzes your code, finds issues, fixes them automatically. Safe mode by default — won't break anything.
-
-### Setup Wizard
-
-First time? Run the wizard:
-
-```bash
-reflex setup
-```
-
-It will:
-- Detect your project type
-- Ask what you care about
-- Configure everything automatically
-- Run your first analysis
+Don't want to memorize CLI commands? Use the web dashboard.
 
 ### Web Dashboard
 
-See your code health visually:
-
 **https://georgeo.zo.space/reflex**
 
-- Color-coded metrics (green/yellow/red)
+**How to analyze your code:**
+
+1. Open the dashboard
+2. Paste your GitHub repo URL (e.g., `https://github.com/username/my-app`)
+3. Click "Analyze"
+4. See your score and what needs work
+
+**Features:**
+- Visual scorecard with color-coded metrics
+- Click any metric to learn what it means
 - Plain English explanations
-- Click to learn more
-- One-click fix button
+- "Fix Issues" button
+- No terminal, no installation
 
-No terminal needed.
+**Note:** For full analysis of private repos, use the CLI or GitHub webhook integration.
 
-### Plain English Explanations
+---
 
-Every metric explained in simple terms:
+## Ways to Import Your Code
+
+### 1. Web Dashboard (Beginners)
+```
+https://georgeo.zo.space/reflex
+```
+Paste GitHub URL → Get scorecard. Zero setup.
+
+### 2. CLI — Local Project (All Users)
+```bash
+reflex introspect --project ./my-app
+reflex check ./my-app
+```
+Best for: Private repos, local development, CI/CD.
+
+### 3. CLI — Natural Language (Beginners)
+```bash
+reflex ask "check my code in this folder"
+reflex ask "fix the problems"
+```
+Just describe what you want. No flags, no commands to memorize.
+
+### 4. GitHub Webhook (Teams)
+Connect your repo → Automatic PR analysis.
+See: [GitHub App Setup](#github-app--pr-quality-checks)
+
+### 5. File Upload (Coming Soon)
+Drag and drop files to web dashboard.
+Follow GitHub issue #1 for updates.
+
+---
+
+## CLI Reference
+
+The CLI is fully available. Use it for:
+
+- Local development
+- CI/CD pipelines
+- Private repositories
+- Batch analysis
+- Custom configurations
+
+### Commands
 
 ```bash
-reflex explain tests
+# Beginner-friendly
+reflex setup                     # Interactive setup wizard
+reflex check [path]              # Quick health check
+reflex fix [path]                # Safe auto-fix
+reflex ask "your question"       # Natural language
 
-# What it means: How much of your code runs during tests.
-# Why it matters: Untested code might have bugs you don't know about.
-# Common issues: Missing tests for utility functions, uncovered branches.
-# How to improve: Write tests for each function, test error paths too.
+# Standard commands
+reflex introspect [options]      # Detailed analysis
+reflex prescribe [options]       # Generate fix plan
+reflex evolve [options]          # Execute fixes
+reflex full-cycle [options]      # Complete loop
+
+# Utilities
+reflex unstuck --problem "..."   # Debug help
+reflex explain <metric>          # Plain English docs
+```
+
+### Options
+
+```bash
+--project <path>     # Project directory (default: current)
+--json               # JSON output for scripts
+--verbose            # Detailed breakdown
+--dry-run            # Preview fixes without applying
+--max <n>            # Max cycles (for full-cycle)
 ```
 
 ---
