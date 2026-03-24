@@ -97,8 +97,15 @@ async function main() {
     process.exit(1);
   }
 
-  // Pass remaining args to the script
-  process.argv = [process.argv[0], scriptPath, ...args.slice(1)];
+  // Handle bare arguments for check/introspect commands
+  // If it's a GitHub URL or path without --project flag, add the flag
+  let scriptArgs = args.slice(1);
+  if ((command === 'check' || command === 'introspect') && scriptArgs.length > 0 && !scriptArgs[0].startsWith('-')) {
+    scriptArgs = ['--project', scriptArgs[0], ...scriptArgs.slice(1)];
+  }
+  
+  // Pass args to the script
+  process.argv = [process.argv[0], scriptPath, ...scriptArgs];
 
   // Import and run the script
   await import(scriptPath);
