@@ -16,7 +16,7 @@ import {
   loadState,
   MemoryStore,
   ReflexState
-} from "../reflex-core/scripts/context.js";
+} from "./context.ts";
 
 // Detect default provider
 function detectDefaultProvider(): "openai" | "anthropic" | "ollama" | "zo" {

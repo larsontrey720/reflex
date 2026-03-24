@@ -105,7 +105,13 @@ export function loadMemory(): MemoryStore {
     return { incidents: [], patterns: [], decisions: [], cycles: [] };
   }
   try {
-    return JSON.parse(readFileSync(MEMORY_PATH, "utf-8"));
+    const data = JSON.parse(readFileSync(MEMORY_PATH, "utf-8"));
+    return {
+      incidents: data.incidents || [],
+      patterns: data.patterns || [],
+      decisions: data.decisions || [],
+      cycles: data.cycles || [],
+    };
   } catch {
     return { incidents: [], patterns: [], decisions: [], cycles: [] };
   }
