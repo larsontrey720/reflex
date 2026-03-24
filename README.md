@@ -54,12 +54,20 @@ https://georgeo.zo.space/reflex
 ```
 Paste GitHub URL → Get scorecard. Zero setup.
 
-### 2. CLI — Local Project (All Users)
+### 2. CLI — Local Project or GitHub URL (All Users)
 ```bash
+# Local project
 reflex introspect --project ./my-app
 reflex check ./my-app
+
+# GitHub repository (public or private)
+reflex introspect --project https://github.com/username/my-app
+reflex check https://github.com/username/repo
+
+# GitHub shorthand
+reflex introspect --project username/repo
 ```
-Best for: Private repos, local development, CI/CD.
+Best for: Private repos, local development, CI/CD, remote analysis.
 
 ### 3. CLI — Natural Language (Beginners)
 ```bash
