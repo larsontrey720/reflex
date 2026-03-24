@@ -380,76 +380,200 @@ MIT
 
 ---
 
-## GitHub Integration
+## GitHub App — PR Quality Checks
 
-Reflex can automatically analyze your pull requests and post quality scorecards as PR comments.
+Reflex automatically analyzes your pull requests and posts quality scorecards as PR comments. No CLI needed — just connect your repo.
 
-### Quick Setup (2 minutes)
+### Quick Setup (Public Instance)
 
-1. **Create a webhook in your repo**
-   - Go to: Your Repo → Settings → Webhooks → Add webhook
+Use the hosted Reflex instance on any public or private repo:
+
+**Step 1: Create a GitHub Personal Access Token**
+
+1. Go to https://github.com/settings/personal-access-tokens/new
+2. Configure:
+   - **Name**: `Reflex Bot`
+   - **Expiration**: 90 days (or custom)
+   - **Repository access**: 
+     - Option A: "Only select repositories" → pick your repos
+     - Option B: "All repositories" (if you want it everywhere)
+   - **Permissions**:
+     - `Contents`: Read
+     - `Pull requests`: Read and Write
+     - `Metadata`: Read
+3. Click "Generate token"
+4. Copy the token (you won't see it again)
+
+**Step 2: Add Webhook to Your Repo**
+
+1. Go to your repository → Settings → Webhooks → Add webhook
+2. Configure:
    - **Payload URL**: `https://georgeo.zo.space/api/reflex-webhook`
    - **Content type**: `application/json`
-   - **Secret**: Generate a random string (save this)
-   - **Events**: Check "Pull requests"
-   - Click "Add webhook"
+   - **Secret**: `reflex-public-2026` (or generate your own)
+   - **Which events**: Select "Let me select individual events" → check only "Pull requests"
+   - **Active**: Yes
+3. Click "Add webhook"
 
-2. **Create a GitHub token**
-   - Go to: Settings → Developer settings → Personal access tokens → Fine-grained tokens
-   - **Permissions**: Contents (Read), Pull requests (Read and Write), Metadata (Read)
-   - Generate and save the token
+**Step 3: Set Your Token (If Using Custom Secret)**
 
-3. **Configure secrets in Zo**
-   - Go to [Settings → Advanced](/?t=settings&s=advanced)
-   - Add:
-     ```
-     REFLEX_GITHUB_WEBHOOK_SECRET=your-webhook-secret
-     REFLEX_GITHUB_APP_TOKEN=your-personal-access-token
-     ```
+If you used a custom webhook secret instead of `reflex-public-2026`, email the token and secret to set up access:
+- **Email**: georgeo@zo.computer
+- **Subject**: Reflex Bot Access Request
+- **Body**: Your PAT token and webhook secret
 
-4. **Open a pull request**
-   - Create a PR in your repo
-   - Reflex will automatically post a quality scorecard comment
+**Step 4: Test It**
 
-### Example PR Comment
+1. Open a pull request in your repo
+2. Wait ~10 seconds
+3. See the Reflex quality scorecard appear as a comment
+
+---
+
+### What You'll See
+
+When you open or update a PR, Reflex posts a comment like this:
 
 ```markdown
 ## ⚡ Reflex Quality Check
 
-**Score: 78/100** (+6)
+**Score: 78/100** (+6 from base)
 
-| Metric | Value | Status |
-|--------|-------|--------|
-| Type Integrity | 89% | ✓ |
-| Test Coverage | 72% | ⚠ |
-| Code Complexity | 12 avg | ✓ |
-| Security Posture | 0 issues | ✓ |
-| Dependency Health | 100% | ✓ |
-| Code Consistency | 94% | ✓ |
-| Build Performance | 1.2s | ✓ |
-| Documentation Health | 67% | ⚠ |
-| Error Handling | 85% | ✓ |
-| Architectural Health | 78% | ⚠ |
+| Metric | Value | Status | Change |
+|--------|-------|--------|--------|
+| Type Integrity | 89% | ✓ | +3% |
+| Test Breadth | 72% | ⚠ | -2% |
+| Test Depth | 45% | ⚠ | +5% |
+| Cyclomatic Load | 8 avg | ✓ | -1 |
+| Coupling Factor | 32% | ✓ | — |
+| Vulnerability Score | 0 | ✓ | — |
+| Dependency Freshness | 94% | ✓ | +2% |
+| Lint Hygiene | 97% | ✓ | +1% |
+| Documentation Ratio | 67% | ⚠ | — |
+| Build Efficiency | 1.2s | ✓ | -0.3s |
+
+### Recommendations
+
+1. **Test Breadth** dropped 2%. Consider adding tests for:
+   - `src/utils/parser.ts` (line 42-67 uncovered)
+   - `src/api/handlers.ts` (error path untested)
+
+2. **Documentation Ratio** at 67%. Add JSDoc to:
+   - `processPayment()` — public API, no docs
+   - `validateInput()` — complex logic, needs explanation
 
 ---
-_Powered by [Reflex](https://github.com/larsontrey720/reflex)_
+_Analyzed by [Reflex](https://github.com/larsontrey720/reflex) • [Setup on your repo](https://github.com/larsontrey720/reflex#github-app--pr-quality-checks)_
 ```
 
-### Webhook Endpoint
+---
 
-**URL**: `https://georgeo.zo.space/api/reflex-webhook`
+### Configuration Options
 
-**Events handled**:
-- `pull_request.opened`
-- `pull_request.synchronize` (new commits)
-- `pull_request.reopened`
+You can customize Reflex behavior by adding a `.reflex.yml` file to your repo root:
 
-**Response**:
-```json
-{
-  "status": "success",
-  "score": 78,
-  "pr": 42
-}
+```yaml
+# .reflex.yml
+
+# Minimum score to pass PR (blocks merge if below)
+minimum_score: 70
+
+# Metrics to include/exclude
+metrics:
+  include:
+    - typeIntegrity
+    - testBreadth
+    - vulnerabilityScore
+  exclude:
+    - documentationRatio  # Skip docs for this project
+
+# Auto-comment settings
+comment:
+  on_opened: true      # Comment on new PRs
+  on_sync: true        # Comment when new commits pushed
+  on_reopened: true    # Comment when PR reopened
+
+# Fail check if score drops
+fail_on_regression: true
 ```
 
+---
+
+### Self-Hosting Reflex
+
+Want to run your own instance? Here's how:
+
+**Option 1: Deploy to Zo Computer**
+
+1. Fork this repo
+2. Create a Zo Computer account at https://zocomputer.com
+3. Create a new site from your fork
+4. Add these secrets in Settings → Advanced:
+   ```
+   REFLEX_GITHUB_WEBHOOK_SECRET=your-secret
+   REFLEX_GITHUB_APP_TOKEN=your-pat
+   ```
+5. Update your webhook URL to your Zo Space
+
+**Option 2: Deploy to Your Server**
+
+```bash
+# Clone
+git clone https://github.com/larsontrey720/reflex.git
+cd reflex
+
+# Install dependencies
+bun install
+
+# Set environment
+export REFLEX_GITHUB_WEBHOOK_SECRET=your-secret
+export REFLEX_GITHUB_APP_TOKEN=your-pat
+
+# Run webhook server
+bun serve --port 3000
+```
+
+Then point your webhook to `https://your-server.com/webhook`.
+
+---
+
+### Troubleshooting
+
+**No comment appears on PR:**
+
+1. Check webhook delivery in GitHub: Repo → Settings → Webhooks → click webhook → "Recent Deliverations"
+2. Look for response code — should be 200
+3. If 401/403: Token lacks permissions
+4. If 500: Webhook server error — check logs
+
+**Comment shows "Error analyzing repository":**
+
+- Repository may be empty or have no TypeScript/JavaScript files
+- Check that the repo has a `package.json` or `tsconfig.json`
+
+**Score seems wrong:**
+
+- Reflex analyzes TypeScript/JavaScript primarily
+- For other languages, only general metrics apply (lint, dependencies)
+
+**Want to disable for specific PRs:**
+
+Add `[skip reflex]` or `[no reflex]` to your PR title or description.
+
+---
+
+### Rate Limits
+
+The public instance has these limits:
+- **Public repos**: Unlimited
+- **Private repos**: 100 PRs/day per user
+
+For higher limits, self-host your own instance.
+
+---
+
+### Support
+
+- **Issues**: https://github.com/larsontrey720/reflex/issues
+- **Email**: georgeo@zo.computer
+- **Zo Discord**: https://discord.gg/zocomputer
