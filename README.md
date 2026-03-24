@@ -577,3 +577,229 @@ For higher limits, self-host your own instance.
 - **Issues**: https://github.com/larsontrey720/reflex/issues
 - **Email**: georgeo@zo.computer
 - **Zo Discord**: https://discord.gg/zocomputer
+
+---
+
+## Notifications — Slack, Discord, Telegram
+
+Reflex can send quality alerts to your team chat. Get notified when:
+- A PR is analyzed
+- Quality drops below threshold
+- Autonomous fixes are applied
+- Regressions are detected
+
+### Quick Setup
+
+Add environment variables for the platforms you want:
+
+```bash
+# Slack
+export REFLEX_SLACK_WEBHOOK=https://hooks.slack.com/services/T00/B00/xxx
+
+# Discord
+export REFLEX_DISCORD_WEBHOOK=https://discord.com/api/webhooks/123/xxx
+
+# Telegram
+export REFLEX_TELEGRAM_BOT_TOKEN=123456:ABC-xxx
+export REFLEX_TELEGRAM_CHAT_ID=-1001234567890
+
+# Custom webhook
+export REFLEX_CUSTOM_WEBHOOK=https://your-webhook.com/endpoint
+```
+
+Configure multiple platforms — Reflex sends to all enabled webhooks.
+
+---
+
+### Slack Setup
+
+1. Go to https://api.slack.com/apps
+2. Create new app → "Incoming Webhooks"
+3. Activate webhooks → "Add New Webhook to Workspace"
+4. Select channel → Copy webhook URL
+5. Set environment variable:
+   ```bash
+   export REFLEX_SLACK_WEBHOOK=https://hooks.slack.com/services/T00/B00/xxx
+   ```
+
+**What you'll see:**
+
+```
+⚡ Reflex Quality Check
+
+Score:
+🟢 78/100 (+6)
+
+Project:
+myorg/my-app
+
+Metrics:
+✅ Type Integrity: 89% (+3%)
+⚠️ Test Breadth: 72% (-2%)
+⚠️ Test Depth: 45% (+5%)
+✅ Cyclomatic Load: 8 avg (-1)
+✅ Coupling Factor: 32%
+✅ Vulnerability Score: 0
+✅ Dependency Freshness: 94%
+✅ Lint Hygiene: 97%
+⚠️ Documentation Ratio: 67%
+✅ Build Efficiency: 1.2s
+
+Recommendations:
+• Test Breadth dropped 2%. Add tests for src/utils/parser.ts
+• Documentation Ratio at 67%. Add JSDoc to processPayment()
+
+[View Details]
+
+_Powered by Reflex_
+```
+
+---
+
+### Discord Setup
+
+1. Go to your Discord server → Channel Settings → Integrations → Webhooks
+2. Click "New Webhook"
+3. Name it "Reflex" (avatar auto-loaded)
+4. Copy webhook URL
+5. Set environment variable:
+   ```bash
+   export REFLEX_DISCORD_WEBHOOK=https://discord.com/api/webhooks/123/xxx
+   ```
+
+**What you'll see:**
+
+Rich embed with:
+- 🟢/🟡/🔴 color based on score
+- Score with trend indicator
+- Metrics in compact grid
+- Recommendations section
+- Clickable link to PR/cycle
+
+---
+
+### Telegram Setup
+
+**Option A: Bot in Group/Channel**
+
+1. Create bot via [@BotFather](https://t.me/BotFather) → `/newbot`
+2. Copy bot token
+3. Add bot to group/channel as admin
+4. Get chat ID:
+   - For groups: Forward a message to [@userinfobot](https://t.me/userinfobot)
+   - For channels: Use `@channel_name` or numeric ID
+5. Set environment variables:
+   ```bash
+   export REFLEX_TELEGRAM_BOT_TOKEN=123456:ABC-xxx
+   export REFLEX_TELEGRAM_CHAT_ID=-1001234567890
+   ```
+
+**Option B: Personal Notifications**
+
+1. Create bot via [@BotFather](https://t.me/BotFather)
+2. Start chat with your bot
+3. Get your user ID from [@userinfobot](https://t.me/userinfobot)
+4. Set:
+   ```bash
+   export REFLEX_TELEGRAM_BOT_TOKEN=123456:ABC-xxx
+   export REFLEX_TELEGRAM_CHAT_ID=123456789
+   ```
+
+**What you'll see:**
+
+```
+⚡ PR #42: Add payment processing
+
+🟢 Score: 78/100 (📈+6)
+
+📊 Metrics:
+✅ Type Integrity: 89%
+⚠️ Test Breadth: 72%
+⚠️ Test Depth: 45%
+✅ Cyclomatic Load: 8 avg
+✅ Coupling Factor: 32%
+✅ Vulnerability Score: 0
+✅ Dependency Freshness: 94%
+✅ Lint Hygiene: 97%
+⚠️ Documentation Ratio: 67%
+✅ Build Efficiency: 1.2s
+
+📝 Recommendations:
+• Test coverage dropped in src/utils/
+• Add JSDoc to processPayment()
+
+[View Details](https://github.com/...)
+
+_Powered by [Reflex](https://github.com/larsontrey720/reflex)_
+```
+
+---
+
+### Custom Webhooks
+
+Send to your own endpoint:
+
+```bash
+export REFLEX_CUSTOM_WEBHOOK=https://your-server.com/webhook
+```
+
+**Payload format:**
+
+```json
+{
+  "timestamp": "2026-03-24T09:30:00.000Z",
+  "source": "reflex",
+  "version": "1.0.0",
+  "data": {
+    "title": "PR #42: Add payment processing",
+    "score": 78,
+    "scoreChange": 6,
+    "project": "myorg/my-app",
+    "branch": "feature/payments",
+    "pr": 42,
+    "url": "https://github.com/myorg/my-app/pull/42",
+    "metrics": [
+      { "name": "Type Integrity", "value": "89%", "status": "ok", "change": "+3%" },
+      { "name": "Test Breadth", "value": "72%", "status": "warn", "change": "-2%" }
+    ],
+    "recommendations": [
+      "Test coverage dropped in src/utils/",
+      "Add JSDoc to processPayment()"
+    ]
+  }
+}
+```
+
+---
+
+### Notification Events
+
+By default, notifications fire on:
+- PR opened, synced, reopened
+- Full cycle completed
+- Regression detected
+- Autonomous fix applied
+
+Configure in `.reflex.yml`:
+
+```yaml
+notifications:
+  slack:
+    events: [pr, regression, fix]  # Don't notify on cycle
+    minimum_score: 70              # Only notify if below 70
+  
+  discord:
+    events: [regression]           # Only regression alerts
+  
+  telegram:
+    events: [pr, cycle, fix, regression]  # All events
+```
+
+---
+
+### Rate Limits
+
+Reflex won't spam your channels:
+- Max 1 notification per PR per 5 minutes
+- Max 20 notifications per hour per channel
+- Duplicate events deduplicated within 10 minutes
