@@ -249,23 +249,46 @@ reflex explain <metric>          # Plain English docs
 ### Install
 
 ```bash
-# Clone and link
+# Clone and install dependencies
 git clone https://github.com/larsontrey720/reflex.git
 cd reflex
-bun link
+bun install
 
-# Or one-liner install (Zo Computer)
-curl -fsSL https://raw.githubusercontent.com/larsontrey720/reflex/main/install.sh | bash
+# Run using bun (recommended)
+bun cli/index.ts check ./my-app
+
+# Or link globally (optional)
+bun link
+reflex check ./my-app
+```
+
+### Quick Start
+
+```bash
+# Check a local project
+bun cli/index.ts check ./my-app
+
+# Check a GitHub repository
+bun cli/index.ts check https://github.com/username/repo
+
+# Full quality check with fixes
+bun cli/index.ts full-cycle --project ./my-app --dry-run
+
+# Get help
+bun cli/index.ts --help
 ```
 
 ### Run
 
 ```bash
-# Diagnose your codebase
-reflex introspect --project ./my-app
+# Diagnose your codebase (local)
+bun cli/index.ts check ./my-app
+
+# Diagnose a GitHub repo
+bun cli/index.ts check https://github.com/username/repo
 
 # Full self-enhancement cycle
-reflex full-cycle --project ./my-app
+bun cli/index.ts full-cycle --project ./my-app
 ```
 
 ---
