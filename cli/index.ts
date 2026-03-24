@@ -7,27 +7,27 @@
 
 import { resolve, dirname } from "node:path";
 import { existsSync } from "node:fs";
-import { spawn } from "node:child_process";
 
 // Resolve from cli/ directory to parent (where skills are)
-const REFLEX_ROOT = dirname(dirname(import.meta.path));
+const REFLEX_ROOT = dirname(dirname(import.meta.url.replace("file://", "")));
+const SKILLS_DIR = resolve(REFLEX_ROOT, "skills");
 
 const COMMANDS: Record<string, string> = {
-  introspect: "reflex-introspect/scripts/introspect.ts",
-  prescribe: "reflex-prescribe/scripts/prescribe.ts",
-  evolve: "reflex-evolve/scripts/evolve.ts",
-  interview: "reflex-interview/scripts/interview.ts",
-  eval: "reflex-eval/scripts/eval.ts",
-  unstuck: "reflex-unstuck/scripts/unstuck.ts",
-  loop: "reflex-loop/scripts/loop.ts",
-  "full-cycle": "cli/full-cycle.ts",
+  introspect: `${SKILLS_DIR}/reflex-introspect/scripts/introspect.ts`,
+  prescribe: `${SKILLS_DIR}/reflex-prescribe/scripts/prescribe.ts`,
+  evolve: `${SKILLS_DIR}/reflex-evolve/scripts/evolve.ts`,
+  interview: `${SKILLS_DIR}/reflex-interview/scripts/interview.ts`,
+  eval: `${SKILLS_DIR}/reflex-eval/scripts/evaluate.ts`,
+  unstuck: `${SKILLS_DIR}/reflex-unstuck/scripts/unstuck.ts`,
+  loop: `${SKILLS_DIR}/reflex-loop/scripts/autofix.ts`,
+  security: `${SKILLS_DIR}/reflex-security/scripts/scan.ts`,
+  plan: `${SKILLS_DIR}/reflex-planner/scripts/plan.ts`,
+  setup: `${SKILLS_DIR}/reflex-wizard/scripts/wizard.ts`,
+  "full-cycle": resolve(REFLEX_ROOT, "cli/full-cycle.ts"),
   // Beginner-friendly aliases
-  check: "reflex-introspect/scripts/introspect.ts",
-  fix: "reflex-evolve/scripts/evolve.ts",
-  security: "reflex-security/scripts/scan.ts",
-  plan: "reflex-planner/scripts/plan.ts",
-  setup: "reflex-wizard/scripts/wizard.ts",
-  ask: "cli/ask.ts",
+  check: `${SKILLS_DIR}/reflex-introspect/scripts/introspect.ts`,
+  fix: `${SKILLS_DIR}/reflex-evolve/scripts/evolve.ts`,
+  ask: resolve(REFLEX_ROOT, "cli/ask.ts"),
 };
 
 const help = `
@@ -37,9 +37,13 @@ Usage:
   reflex <command> [options]
 
 Commands:
-  introspect     Diagnose code health across 7 metrics
+  check          Analyze code health (alias for introspect)
+  fix            Auto-fix issues (alias for evolve)
+  introspect     Diagnose code health across 10 metrics
   prescribe      Generate improvement prescription
   evolve         Execute prescription with LLM
+  security       Security vulnerability scan
+  plan           Generate improvement plan
   interview      Socratic requirements interview
   eval           Three-stage verification pipeline
   unstuck        Get unstuck with lateral-thinking personas
@@ -47,7 +51,7 @@ Commands:
   full-cycle     Run complete self-enhancement cycle
 
 Options:
-  --project, -p   Target project directory (default: cwd)
+  --project, -p   Target project directory or GitHub URL
   --json          Output as JSON for scripting
   --verbose       Show detailed output
   --dry-run       Generate but don't execute
@@ -60,9 +64,9 @@ Environment:
   REFLEX_SEEDS_DIR       Prescription output directory
 
 Examples:
-  reflex introspect --project ./my-app
-  reflex prescribe --scorecard scorecard.json
-  reflex evolve --prescription rx-test-coverage.json
+  reflex check ./my-app
+  reflex check https://github.com/user/repo
+  reflex fix --project ./my-app --dry-run
   reflex full-cycle --project ./my-app
   reflex unstuck --problem "I keep hitting the same error"
 
@@ -86,14 +90,18 @@ async function main() {
     process.exit(1);
   }
 
-  const fullPath = resolve(REFLEX_ROOT, scriptPath);
-  if (!existsSync(fullPath)) {
-    console.error(`Script not found: ${fullPath}`);
+  if (!existsSync(scriptPath)) {
+    console.error(`Script not found: ${scriptPath}`);
+    console.log("\nMake sure you're running from the reflex directory.");
+    console.log("Try: bun run cli/index.ts <command>");
     process.exit(1);
   }
 
+  // Pass remaining args to the script
+  process.argv = [process.argv[0], scriptPath, ...args.slice(1)];
+
   // Import and run the script
-  await import(fullPath);
+  await import(scriptPath);
 }
 
 main().catch(console.error);
