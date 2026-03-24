@@ -46,9 +46,117 @@ Don't want to memorize CLI commands? Use the web dashboard.
 
 ---
 
-## Coming Soon — From CodeRabbit & Others
+## Security Features (from BugBunny.ai)
 
-Borrowing the best features
+Reflex integrates security scanning inspired by BugBunny.ai — autonomous penetration testing with AI agents.
+
+### Security Scanner
+
+Detects vulnerabilities before they reach production:
+
+```bash
+reflex security --project ./my-app
+```
+
+**Detects:**
+| Type | CVSS | Examples |
+|------|------|----------|
+| SQL Injection | 9.8 | Unparameterized queries |
+| XSS | 6.1 | innerHTML with user input |
+| RCE | 10.0 | eval(), exec() with user input |
+| Secrets | 9.1 | Hardcoded API keys, passwords |
+| SSRF | 7.5 | Fetch with user-provided URLs |
+| Path Traversal | 7.5 | readFile with user input |
+| XXE | 9.8 | Unconfigured XML parsers |
+
+**Output:**
+```
+═ REFLEX SECURITY SCAN REPORT ═
+Project: ./my-app
+Total Findings: 3
+
+🔴 CRITICAL (1)
+  [SQLI] src/db/queries.ts:42
+  CVSS: 9.8 | SQL Injection detected
+  Fix: Use parameterized queries
+
+🟠 HIGH (2)
+  [SECRETS] src/config.ts:15
+  CVSS: 9.1 | Hardcoded API key
+  Fix: Use environment variables
+
+Security Score: 94/100
+```
+
+---
+
+## Dev Tools (from CodeRabbit & Others)
+
+### Plan Generator
+
+Turn vague ideas into clear phased plans:
+
+```bash
+reflex plan "add user authentication"
+```
+
+**Output:**
+```
+═ DEVELOPMENT PLAN: USER AUTHENTICATION ═
+
+┌─ PHASE 1: Research & Design ─────────────
+│  Tasks:
+│  □ Analyze requirements
+│  □ Design auth flow
+│  □ Choose auth provider
+│  Risks:
+│  ⚠ Unclear OAuth scope requirements
+└──────────────────────────────────────────────
+
+┌─ PHASE 2: Implementation ───────────────────
+│  Tasks:
+│  □ Set up auth middleware
+│  □ Implement login/register endpoints
+│  □ Add session management
+│  Dependencies:
+│  → Design approved
+└──────────────────────────────────────────────
+```
+
+### Pre-commit Hook
+
+Quality gate before every commit:
+
+```bash
+reflex pre-commit --install   # Install git hook
+reflex pre-commit --fix       # Auto-fix issues
+```
+
+### Analytics Tracking
+
+Track quality over time:
+
+```bash
+reflex analytics --record     # Save current score
+reflex analytics --weekly     # Weekly trends
+```
+
+### Risk Scoring
+
+Calculate PR risk level:
+
+```bash
+reflex risk --files 15 --lines 300 --database
+```
+
+### Knowledge Graph
+
+Ask questions about your codebase:
+
+```bash
+reflex graph --question "how does auth work?"
+reflex graph --format mermaid > graph.md
+```
 
 ---
 
@@ -302,10 +410,25 @@ export REFLEX_LLM_API_KEY=xxx
 ## Commands
 
 ```bash
+# Core loop
 reflex introspect [options]     # Diagnose code health
 reflex prescribe [options]      # Generate fix prescription
 reflex evolve [options]         # Execute fixes
 reflex full-cycle [options]     # Complete loop (diagnose → fix → verify)
+
+# Security (from BugBunny.ai)
+reflex security [options]       # Vulnerability scanner
+reflex security --json          # JSON output
+
+# Dev tools (from CodeRabbit & others)
+reflex plan "your idea"         # Generate development plan
+reflex pre-commit --install     # Install git hook
+reflex pre-commit --fix         # Auto-fix issues
+reflex analytics --record       # Track quality over time
+reflex risk --pr 42             # Calculate PR risk
+reflex graph --question "..."   # Ask about codebase
+
+# Utilities
 reflex interview [options]      # Socratic requirements gathering
 reflex eval [options]           # Three-stage verification
 reflex unstuck [options]        # Lateral-thinking debug personas
@@ -655,7 +778,7 @@ Then point your webhook to `https://your-server.com/webhook`.
 
 **No comment appears on PR:**
 
-1. Check webhook delivery in GitHub: Repo → Settings → Webhooks → click webhook → "Recent Deliverations"
+1. Check webhook delivery in GitHub: Repo → Settings → Webhooks → click webhook → "Recent Deliveries"
 2. Look for response code — should be 200
 3. If 401/403: Token lacks permissions
 4. If 500: Webhook server error — check logs
