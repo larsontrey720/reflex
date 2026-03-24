@@ -132,9 +132,9 @@ reflex graph --question "how does auth work?"
 reflex graph --format mermaid > graph.md
 ```
 
-## PlayerZero-Inspired Features
+## Predictive Features
 
-Reflex borrows key concepts from PlayerZero, the $20M-funded "Engineering World Model" platform:
+
 
 ### Simulate — Pre-Merge Prediction
 
