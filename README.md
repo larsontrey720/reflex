@@ -463,7 +463,7 @@ bun skills/reflex-unstuck/scripts/unstuck.ts --problem "async race condition"
 
 ---
 
-## Unstuck Personas (9 Total)
+## Reflex Personas (9 Total)
 
 When you're stuck on a problem, Reflex has 9 lateral-thinking personas:
 
