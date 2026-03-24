@@ -6,9 +6,9 @@
  */
 
 import { parseArgs } from "node:util";
-import { spawnSync } from "node:child_process";
+import { spawnSync, execSync } from "node:child_process";
 import { resolve, dirname, join } from "node:path";
-import { existsSync, mkdirSync, writeFileSync, readFileSync, mkdtempSync } from "node:fs";
+import { existsSync, mkdirSync, writeFileSync, readFileSync, mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 
 const REFLEX_ROOT = dirname(dirname(import.meta.path));
@@ -53,7 +53,7 @@ Usage:
   reflex full-cycle [options]
 
 Options:
-  -p, --project <path>   Target project directory
+  -p, --project <path>   Target project directory or GitHub URL
   --max <number>         Maximum improvement cycles (default: 1)
   --dry-run              Generate fixes but don't apply them
   --json                 Output JSON format
@@ -68,7 +68,50 @@ Process:
   process.exit(0);
 }
 
-const project = resolve(values.project as string);
+let projectArg = values.project as string;
+let clonedDir: string | null = null;
+
+// Handle GitHub URLs
+if (projectArg.includes('github.com') || projectArg.match(/^[\w-]+\/[\w-]+$/)) {
+  console.log(`Analyzing project: ${projectArg}`);
+  console.error('Fetching from GitHub...');
+  
+  let owner: string, repo: string;
+  
+  if (projectArg.startsWith('http')) {
+    const url = new URL(projectArg);
+    const parts = url.pathname.split('/').filter(Boolean);
+    owner = parts[0];
+    repo = parts[1]?.replace('.git', '') || '';
+  } else {
+    const parts = projectArg.split('/');
+    owner = parts[0];
+    repo = parts[1] || '';
+  }
+  
+  if (!owner || !repo) {
+    console.error('Invalid repository format. Use: username/repo or https://github.com/username/repo');
+    process.exit(1);
+  }
+  
+  // Clone to temp directory
+  clonedDir = `/tmp/reflex-repo-${Date.now()}`;
+  const cloneUrl = `https://github.com/${owner}/${repo}.git`;
+  
+  try {
+    execSync(`git clone --depth 1 ${cloneUrl} ${clonedDir}`, { 
+      encoding: 'utf-8', 
+      timeout: 60000,
+      stdio: ['pipe', 'pipe', 'pipe'] 
+    });
+    projectArg = clonedDir;
+  } catch (e: any) {
+    console.error(`Failed to clone repository: ${e.message}`);
+    process.exit(1);
+  }
+}
+
+const project = resolve(projectArg);
 const maxCycles = parseInt(values.max as string) || 1;
 const dryRun = values["dry-run"] as boolean;
 
@@ -173,7 +216,7 @@ while (cycleCount < maxCycles && improved) {
     console.log("\nProposed fix:");
     console.log(`  Playbook: ${prescription.playbookName}`);
     console.log(`  Target: ${prescription.goal}`);
-    console.log(`  Files: ${prescription.targetFiles.join(", ")}`);
+    console.log(`  Files: ${prescription.targetFiles?.join(", ") || "N/A"}`);
     improved = false;
   } else {
     const evolveResult = runScript("reflex-evolve", "evolve.ts", [
@@ -235,3 +278,10 @@ console.log("=".repeat(60));
 console.log(`Cycles run: ${cycleCount}`);
 console.log(`Project: ${project}`);
 console.log("=".repeat(60) + "\n");
+
+// Cleanup cloned directory
+if (clonedDir && existsSync(clonedDir)) {
+  try {
+    rmSync(clonedDir, { recursive: true });
+  } catch {}
+}

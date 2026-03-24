@@ -24,6 +24,8 @@ const COMMANDS: Record<string, CommandConfig> = {
   security: `${SKILLS_DIR}/reflex-security/scripts/scan.ts`,
   plan: `${SKILLS_DIR}/reflex-planner/scripts/plan.ts`,
   setup: `${SKILLS_DIR}/reflex-wizard/scripts/wizard.ts`,
+  wizard: `${SKILLS_DIR}/reflex-wizard/scripts/wizard.ts`,
+  personas: `${SKILLS_DIR}/reflex-unstuck/scripts/unstuck.ts`,
   "full-cycle": resolve(REFLEX_ROOT, "cli/full-cycle.ts"),
   // Beginner-friendly aliases
   check: `${SKILLS_DIR}/reflex-introspect/scripts/introspect.ts`,
@@ -51,11 +53,14 @@ Commands:
   interview      Socratic requirements interview
   eval           Three-stage verification pipeline
   unstuck        Get unstuck with lateral-thinking personas
+  personas       List Reflex personas (alias for unstuck)
+  wizard         Interactive setup wizard
+  setup          Interactive setup wizard (alias for wizard)
   loop           Single-metric optimization loop
   full-cycle     Run complete self-enhancement cycle
-  simulate       Simulate code execution
-  memory         Manage code memory
-  context        Manage code context
+  simulate       Simulate code execution scenarios
+  memory         Manage incident memory
+  context        Query code context graph
 
 Options:
   --project, -p   Target project directory or GitHub URL
@@ -76,6 +81,8 @@ Examples:
   reflex fix --project ./my-app --dry-run
   reflex full-cycle --project ./my-app
   reflex unstuck --problem "I keep hitting the same error"
+  reflex personas --list
+  reflex wizard
 
 Run 'reflex <command> --help' for command-specific options.
 `;
