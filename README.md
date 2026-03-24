@@ -24,33 +24,6 @@ Code reviews catch symptoms, not root causes. Linters flag violations but can't 
 
 ## For Beginners — No Commands Needed
 
-Don't want to memorize CLI commands? Use the web dashboard.
-
-### Web Dashboard
-
-**https://georgeo.zo.space/reflex**
-
-**How to analyze your code:**
-
-1. Open the dashboard
-2. Paste your GitHub repo URL (e.g., `https://github.com/username/my-app`)
-3. Click "Analyze"
-4. See your score and what needs work
-
-**Features:**
-- Visual scorecard with color-coded metrics
-- Click any metric to learn what it means
-- Plain English explanations
-- "Fix Issues" button
-- No terminal, no installation
-
-**Note:** For full analysis of private repos, use the CLI or GitHub webhook integration.
-
----
-
-## Security Features (from BugBunny.ai)
-
-Reflex integrates security scanning inspired by BugBunny.ai — autonomous penetration testing with AI agents.
 
 ### Security Scanner
 
@@ -164,12 +137,6 @@ reflex graph --format mermaid > graph.md
 
 ## Ways to Import Your Code
 
-### 1. Web Dashboard (Beginners)
-```
-https://georgeo.zo.space/reflex
-```
-Paste GitHub URL → Get scorecard. Zero setup.
-
 ### 2. CLI — Local Project or GitHub URL (All Users)
 ```bash
 # Local project
@@ -196,11 +163,6 @@ Just describe what you want. No flags, no commands to memorize.
 Connect your repo → Automatic PR analysis.
 See: [GitHub App Setup](#github-app--pr-quality-checks)
 
-### 5. File Upload (Coming Soon)
-Drag and drop files to web dashboard.
-Follow GitHub issue #1 for updates.
-
----
 
 ## CLI Reference
 
