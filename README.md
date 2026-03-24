@@ -212,24 +212,12 @@ The CLI is fully available. Use it for:
 - Batch analysis
 - Custom configurations
 
-### Commands
+### Quick Commands
 
 ```bash
-# Beginner-friendly
-reflex setup                     # Interactive setup wizard
 reflex check [path]              # Quick health check
 reflex fix [path]                # Safe auto-fix
-reflex ask "your question"       # Natural language
-
-# Standard commands
-reflex introspect [options]      # Detailed analysis
-reflex prescribe [options]       # Generate fix plan
-reflex evolve [options]          # Execute fixes
-reflex full-cycle [options]      # Complete loop
-
-# Utilities
-reflex unstuck --problem "..."   # Debug help
-reflex explain <metric>          # Plain English docs
+reflex ask "your question"       # Natural language Q&A
 ```
 
 ### Options
@@ -425,45 +413,75 @@ export REFLEX_LLM_API_KEY=xxx
 ## Commands
 
 ```bash
-# Core loop
-reflex introspect [options]     # Diagnose code health
-reflex prescribe [options]      # Generate fix prescription
-reflex evolve [options]         # Execute fixes
-reflex full-cycle [options]     # Complete loop (diagnose → fix → verify)
+# === SETUP ===
+reflex setup                      # Interactive setup wizard
+reflex llm --config               # Show LLM configuration
+reflex llm --test                 # Test LLM connection
 
-# Security (from BugBunny.ai)
-reflex security [options]       # Vulnerability scanner
-reflex security --json          # JSON output
+# === ANALYSIS ===
+reflex check [path]               # Quick health check
+reflex introspect [options]       # Detailed analysis
+reflex security [options]         # Vulnerability scan
+reflex risk --pr 42               # Calculate PR risk
 
-# Dev tools (from CodeRabbit & others)
-reflex plan "your idea"         # Generate development plan
-reflex pre-commit --install     # Install git hook
-reflex pre-commit --fix         # Auto-fix issues
-reflex analytics --record       # Track quality over time
-reflex risk --pr 42             # Calculate PR risk
-reflex graph --question "..."   # Ask about codebase
+# === FIXES ===
+reflex fix [path]                 # Safe auto-fix
+reflex prescribe [options]        # Generate fix plan
+reflex evolve [options]           # Execute fixes
+reflex full-cycle [options]       # Complete self-healing loop
 
-# Utilities
-reflex interview [options]      # Socratic requirements gathering
-reflex eval [options]           # Three-stage verification
-reflex unstuck [options]        # Lateral-thinking debug personas
+# === PLANNING ===
+reflex plan "your idea"           # Generate development plan
+reflex interview                  # Socratic requirements gathering
+reflex graph --question "..."     # Ask about codebase
+
+# === HELP ===
+reflex unstuck --problem "..."    # Debug help with personas
+reflex ask "your question"        # Natural language Q&A
+reflex explain <metric>           # Plain English docs
+
+# === DEV TOOLS ===
+reflex eval --artifact <path> --seed <file>   # Three-stage verification
+reflex pre-commit --install       # Install git hook
+reflex pre-commit --fix           # Auto-fix on commit
+reflex analytics --record         # Track quality over time
 ```
 
-### Introspect Options
+### Common Options
 
 ```bash
-reflex introspect --project ./my-app     # Analyze project
-reflex introspect --project . --json     # JSON output
-reflex introspect --metric typeIntegrity # Single metric focus
-reflex introspect --verbose              # Detailed breakdown
+--project <path>     # Project directory (default: current)
+--json               # JSON output for scripts
+--verbose            # Detailed breakdown
+--dry-run            # Preview fixes without applying
+--max <n>            # Max cycles (for full-cycle)
+--scorecard <file>   # Input scorecard (for prescribe)
+--prescription <file> # Input prescription (for evolve)
 ```
 
-### Full Cycle Options
+### Examples
 
 ```bash
-reflex full-cycle --project ./my-app     # Run once
-reflex full-cycle --project . --max 3    # Max 3 improvement cycles
-reflex full-cycle --dry-run              # Generate fixes, don't apply
+# Analyze a GitHub repo
+reflex check https://github.com/owner/repo
+
+# Analyze local project
+reflex introspect --project ./my-app
+
+# JSON output for CI/CD
+reflex introspect --project . --json > scorecard.json
+
+# Full autonomous healing
+reflex full-cycle --project ./my-app --max 3
+
+# Security scan
+reflex security --project ./my-app --json
+
+# Get unstuck on a bug
+reflex unstuck --problem "I keep hitting null pointer exceptions"
+
+# Ask about your code
+reflex ask "Why is my build slow?"
 ```
 
 ---
