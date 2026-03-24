@@ -67,21 +67,8 @@ if (!existsSync(prescriptionPath)) {
   process.exit(1);
 }
 
-// Load LLM client
-const llmClientPath = resolve(import.meta.dir, "../lib/llm-client.ts");
-let callLLM: (prompt: string) => Promise<string>;
-let isConfigured: () => boolean;
-let getConfig: () => any;
-
-try {
-  const llm = await import(llmClientPath);
-  callLLM = llm.callLLM;
-  isConfigured = llm.isConfigured;
-  getConfig = llm.getConfig;
-} catch (e) {
-  console.error("Error: Could not load LLM client");
-  process.exit(1);
-}
+// Import context-aware LLM client
+import { callLLM, isConfigured, getConfig } from resolve("./reflex-core");
 
 // Backup functions
 function createBackup(project: string, backupDir: string): string[] {

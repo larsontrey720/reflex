@@ -1,0 +1,9 @@
+{
+  "name": "reflex-core",
+  "version": "1.0.0",
+  "type": "module",
+  "exports": {
+    ".": "./scripts/context.ts",
+    "./llm": "./scripts/llm-client.ts"
+  }
+}
