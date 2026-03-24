@@ -15,6 +15,8 @@ Your code fixes itself on reflex.
 
 ## Quick Start
 
+**Works on Windows, Mac, and Linux.** Only requirement: [Bun](https://bun.sh) runtime.
+
 ### Install
 
 ```bash
@@ -552,7 +554,7 @@ Recommendation: Run 'reflex prescribe' to generate improvement plan
 
 ## Requirements
 
-- **Bun** v1.0+ (runtime)
+- **Bun** v1.0+ (runtime) — [Install](https://bun.sh) | Works on Windows, Mac, Linux
 - **TypeScript** (for type analysis)
 - **Git** (for snapshots/rollback)
 - **LLM API** (OpenAI, Anthropic, Ollama, or Zo native)
