@@ -1,8 +1,8 @@
-# ⚡ Reflex
+# Reflex
 
 **Your code's reflex. Quality on automatic.**
 
-Reflex is a self-enhancing code quality system. It measures 7 code health metrics, identifies the weakest area, generates a remediation plan, executes fixes autonomously, and verifies the results.
+Reflex is a self-enhancing code quality system. It measures 10 code health metrics, identifies the weakest area, generates a remediation plan from 17 playbooks, executes fixes autonomously, and verifies the results.
 
 Your code fixes itself on reflex.
 
@@ -54,45 +54,84 @@ reflex full-cycle --project ./my-app
 INTROSPECT → PRESCRIBE → EVOLVE → VERIFY → (repeat)
 ```
 
-1. **Introspect** — Measures 7 health metrics, outputs composite score (0-100)
-2. **Prescribe** — Maps weakest metric to a playbook, generates fix specification
+1. **Introspect** — Measures 10 health metrics, outputs composite score (0-100)
+2. **Prescribe** — Maps weakest metric to a playbook from 17 options, generates fix specification
 3. **Evolve** — Executes fixes via LLM, captures before/after scores
 4. **Verify** — Reverts regressions, logs improvements, loops
 
-### 7 Health Metrics
+### 10 Health Metrics
 
 | Metric | What It Measures | Target |
 |--------|------------------|--------|
-| Type Safety | TypeScript strictness, `any` usage | ≥ 90% |
-| Test Coverage | Line/branch coverage | ≥ 80% |
-| Code Complexity | Cyclomatic complexity | ≤ 15 per function |
-| Security Vulns | Known CVEs in dependencies | 0 critical/high |
-| Dependency Health | Outdated, deprecated packages | ≥ 85% fresh |
-| Code Consistency | Lint violations, formatting | ≥ 95% clean |
-| Build Performance | Build time, bundle size | Stable trend |
+| Type Integrity | TypeScript strictness, `any` elimination | ≥ 95% |
+| Test Breadth | Line/branch coverage | ≥ 85% |
+| Test Depth | Edge cases, error paths, integration | ≥ 75% |
+| Cyclomatic Load | Complexity per function | ≤ 12 |
+| Coupling Factor | Dependencies between modules | ≤ 40% cross-module |
+| Vulnerability Score | Known CVEs in dependencies | 0 critical/high |
+| Dependency Freshness | Outdated packages | ≥ 90% current |
+| Lint Hygiene | Violations, formatting | ≥ 98% clean |
+| Documentation Ratio | Commented public APIs | ≥ 80% |
+| Build Efficiency | Build time, bundle size | Stable or improving |
 
-### 14 Playbooks
+### 17 Playbooks
 
-When a metric is weak, Reflex selects from 14 remediation playbooks:
+When a metric is weak, Reflex selects from 17 remediation playbooks:
 
-| ID | Playbook | Metric | Auto-Approve |
-|----|----------|--------|--------------|
-| A | Type Strictness Fix | typeSafety | ✅ |
-| B | Any Elimination | typeSafety | ❌ |
-| C | Coverage Expansion | testCoverage | ✅ |
-| D | Critical Path Tests | testCoverage | ❌ |
-| E | Complexity Reduction | codeComplexity | ✅ |
-| F | God Object Refactor | codeComplexity | ❌ |
-| G | Vulnerability Patch | securityVulns | ✅ |
-| H | Dependency Update | dependencyHealth | ✅ |
-| I | Deprecated Replacement | dependencyHealth | ❌ |
-| J | Lint Fix | codeConsistency | ✅ |
-| K | Formatter Config | codeConsistency | ✅ |
-| L | Bundle Optimization | buildPerformance | ✅ |
-| M | Tree Shaking Fix | buildPerformance | ❌ |
-| N | Performance Profile | buildPerformance | ❌ |
+#### Type Integrity (3)
+| ID | Playbook | Auto-Approve |
+|----|----------|--------------|
+| A | Strict Mode Enablement | Yes |
+| B | Any Type Elimination | No |
+| C | Generic Constraint Addition | Yes |
 
-❌ = Requires human approval (governor blocks autonomous execution)
+#### Test Breadth (3)
+| ID | Playbook | Auto-Approve |
+|----|----------|--------------|
+| D | Coverage Gap Filling | Yes |
+| E | Missing Branch Tests | Yes |
+| F | Critical Path Coverage | No |
+
+#### Test Depth (2)
+| ID | Playbook | Auto-Approve |
+|----|----------|--------------|
+| G | Edge Case Injection | Yes |
+| H | Error Path Verification | No |
+
+#### Cyclomatic Load (2)
+| ID | Playbook | Auto-Approve |
+|----|----------|--------------|
+| I | Function Decomposition | Yes |
+| J | Guard Clause Extraction | Yes |
+
+#### Coupling Factor (2)
+| ID | Playbook | Auto-Approve |
+|----|----------|--------------|
+| K | Interface Extraction | No |
+| L | Module Boundary Enforcement | No |
+
+#### Vulnerability Score (2)
+| ID | Playbook | Auto-Approve |
+|----|----------|--------------|
+| M | CVE Patch Application | Yes |
+| N | Vulnerable Dependency Swap | No |
+
+#### Dependency Freshness (1)
+| ID | Playbook | Auto-Approve |
+|----|----------|--------------|
+| O | Batch Update Execution | Yes |
+
+#### Lint Hygiene (1)
+| ID | Playbook | Auto-Approve |
+|----|----------|--------------|
+| P | Auto-Fix Application | Yes |
+
+#### Documentation Ratio (1)
+| ID | Playbook | Auto-Approve |
+|----|----------|--------------|
+| Q | API Doc Generation | Yes |
+
+**No = Requires human approval (governor blocks autonomous execution)**
 
 ### Governor Safety Rules
 
@@ -163,7 +202,7 @@ reflex unstuck [options]        # Lateral-thinking debug personas
 ```bash
 reflex introspect --project ./my-app     # Analyze project
 reflex introspect --project . --json     # JSON output
-reflex introspect --metric typeSafety    # Single metric focus
+reflex introspect --metric typeIntegrity # Single metric focus
 reflex introspect --verbose              # Detailed breakdown
 ```
 
@@ -222,7 +261,7 @@ Reflex is built as modular Zo Skills:
 | `reflex-loop` | Single-metric optimization |
 | `reflex-interview` | Socratic requirements |
 | `reflex-eval` | Three-stage verification |
-| `reflex-unstuck` | Debug personas |
+| `reflex-unstuck` | 9 debug personas |
 
 Each skill can be used independently:
 
@@ -233,25 +272,28 @@ bun skills/reflex-unstuck/scripts/unstuck.ts --problem "async race condition"
 
 ---
 
-## Unstuck Personas
+## Unstuck Personas (9 Total)
 
-When you're stuck on a problem, Reflex has 6 lateral-thinking personas:
+When you're stuck on a problem, Reflex has 9 lateral-thinking personas:
 
 | Persona | When to Use |
 |---------|-------------|
 | **Debugger** | Errors, exceptions, crashes |
-| **Researcher** | Unexpected behavior, confusion |
-| **Simplifier** | Overwhelming complexity |
-| **Architect** | Coupling, fragility |
-| **Perfectionist** | Code quality, technical debt |
-| **Contrarian** | Questioning the approach |
+| **Investigator** | Unexpected behavior, confusion |
+| **Pruner** | Overwhelming complexity |
+| **Structurer** | Coupling, fragility |
+| **Polisher** | Code quality, technical debt |
+| **Challenger** | Questioning the approach |
+| **Prototyper** | Analysis paralysis, design decisions |
+| **Automator** | Repetitive work, toil |
+| **Shipper** | Perfectionism, release blocking |
 
 ```bash
 reflex unstuck --problem "I keep hitting null pointer exceptions"
 # → Auto-selects Debugger persona
 
-reflex unstuck --persona architect
-# → Get Architect's perspective
+reflex unstuck --persona structurer
+# → Get Structurer's perspective
 ```
 
 ---
@@ -263,20 +305,23 @@ $ reflex introspect --project ./my-app
 
 Analyzing project: /home/user/my-app
 
-╔════════════════════════════════════════════════════════╗
-║  REFLEX INTROSPECTION SCORECARD                        ║
-╠════════════════════════════════════════════════════════╣
-║  ✅ Type Safety          94% → score:100%               ║
-║  ⚠️  Test Coverage        45% → score:56%               ║
-║  ✅ Code Complexity       8 → score:100%                ║
-║  ✅ Security Vulns        0 → score:100%                ║
-║  ⚠️  Dependency Health   72% → score:85%               ║
-║  ✅ Code Consistency     98% → score:100%               ║
-║  ✅ Build Performance   2.1s → score:100%              ║
-╠════════════════════════════════════════════════════════╣
-║  COMPOSITE HEALTH: 91/100                              ║
-║  WEAKEST: Test Coverage (needs attention)              ║
-╚════════════════════════════════════════════════════════╝
+==========================================================
+  REFLEX INTROSPECTION SCORECARD
+==========================================================
+  [OK]   Type Integrity       96% → score: 100%
+  [WARN] Test Breadth         52% → score: 61%
+  [WARN] Test Depth           38% → score: 51%
+  [OK]   Cyclomatic Load       6 → score: 100%
+  [OK]   Coupling Factor      28% → score: 100%
+  [OK]   Vulnerability Score   0 → score: 100%
+  [OK]   Dependency Freshness 94% → score: 100%
+  [OK]   Lint Hygiene         99% → score: 100%
+  [WARN] Documentation Ratio  62% → score: 78%
+  [OK]   Build Efficiency     1.8s → score: 100%
+----------------------------------------------------------
+  COMPOSITE HEALTH: 89/100
+  WEAKEST: Test Depth (needs attention)
+==========================================================
 
 Recommendation: Run 'reflex prescribe' to generate improvement plan
 ```
@@ -299,7 +344,7 @@ Recommendation: Run 'reflex prescribe' to generate improvement plan
   │ INTROSPECT  │────▶│  PRESCRIBE  │────▶│   EVOLVE    │
   │ (diagnose)  │     │   (plan)    │     │  (execute)  │
   │             │     │             │     │             │
-  │ 7 metrics   │     │ 14 playbooks│     │ LLM fixes   │
+  │ 10 metrics  │     │ 17 playbooks│     │ LLM fixes   │
   │ Score 0-100 │     │ Governor    │     │ Pre/post    │
   └─────────────┘     └─────────────┘     └─────────────┘
          │                   │                   │
@@ -325,8 +370,6 @@ Recommendation: Run 'reflex prescribe' to generate improvement plan
 
 ## Credits
 
-Inspired by [Q00/ouroboros](https://github.com/Q00/ouroboros) and [marlandoj/zouroboros-seedkit](https://github.com/marlandoj/zouroboros-seedkit).
-
 Built for [Zo Computer](https://zocomputer.com).
 
 ---
@@ -334,4 +377,3 @@ Built for [Zo Computer](https://zocomputer.com).
 ## License
 
 MIT
-

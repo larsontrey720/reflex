@@ -6,19 +6,40 @@
  */
 
 import { parseArgs } from "node:util";
-import { spawn } from "node:child_process";
-import { resolve, dirname } from "node:path";
-import { mkdirSync, writeFileSync, existsSync, rmSync } from "node:fs";
+import { spawnSync } from "node:child_process";
+import { resolve, dirname, join } from "node:path";
+import { existsSync, mkdirSync, writeFileSync, readFileSync, mkdtempSync } from "node:fs";
+import { tmpdir } from "node:os";
 
-// Resolve from cli/ directory to parent (where skills are)
 const REFLEX_ROOT = dirname(dirname(import.meta.path));
+const SKILLS_DIR = join(REFLEX_ROOT, "skills");
+
+function runScript(skill: string, script: string, args: string[]): { stdout: string; stderr: string; exitCode: number } {
+  const scriptPath = skill === "cli"
+    ? join(REFLEX_ROOT, "cli", script)
+    : join(SKILLS_DIR, skill, "scripts", script);
+  
+  const result = spawnSync("bun", ["run", scriptPath, ...args], {
+    encoding: "utf-8",
+    env: process.env,
+    timeout: 300000, // 5 minutes max
+  });
+  
+  return {
+    stdout: result.stdout || "",
+    stderr: result.stderr || "",
+    exitCode: result.status || 1,
+  };
+}
+
+// === MAIN EXECUTION ===
 
 const { values } = parseArgs({
   options: {
     project: { type: "string", short: "p", default: process.cwd() },
-    "max-cycles": { type: "string", default: "1" },
+    max: { type: "string", default: "1" },
     "dry-run": { type: "boolean", default: false },
-    verbose: { type: "boolean", default: false },
+    json: { type: "boolean", default: false },
     help: { type: "boolean", short: "h", default: false },
   },
   strict: false,
@@ -32,156 +53,185 @@ Usage:
   reflex full-cycle [options]
 
 Options:
-  -p, --project <dir>      Target project (default: current directory)
-  --max-cycles <n>         Maximum improvement cycles (default: 1)
-  --dry-run                Generate prescriptions but don't execute
-  --verbose                Show detailed output
-  -h, --help               Show this help
+  -p, --project <path>   Target project directory
+  --max <number>         Maximum improvement cycles (default: 1)
+  --dry-run              Generate fixes but don't apply them
+  --json                 Output JSON format
+  -h, --help             Show this help
 
-Example:
-  reflex full-cycle --project ./my-app --max-cycles 3
+Process:
+  1. Introspect - Measure 10 code health metrics
+  2. Prescribe - Select from 17 playbooks
+  3. Evolve - Execute fix via LLM
+  4. Verify - Check improvement, revert if regression
 `);
   process.exit(0);
 }
 
-const projectPath = resolve(values.project as string);
-const maxCycles = parseInt(values["max-cycles"] as string, 10);
+const project = resolve(values.project as string);
+const maxCycles = parseInt(values.max as string) || 1;
 const dryRun = values["dry-run"] as boolean;
-const verbose = values.verbose as boolean;
 
-// Seeds directory
-const seedsDir = process.env.REFLEX_SEEDS_DIR || resolve(process.env.HOME || "/root", "Seeds/reflex");
-mkdirSync(seedsDir, { recursive: true });
-
-console.log("\n╔════════════════════════════════════════════════════════╗");
-console.log("║  REFLEX FULL CYCLE                                      ║");
-console.log("╠════════════════════════════════════════════════════════╣");
-console.log(`║  Project: ${projectPath.slice(-40).padStart(40)}  ║`);
-console.log(`║  Max Cycles: ${String(maxCycles).padStart(36)}  ║`);
-console.log(`║  Dry Run: ${String(dryRun).padStart(38)}  ║`);
-console.log("╚════════════════════════════════════════════════════════╝\n");
-
-async function runScript(scriptPath: string, args: string[]): Promise<{ stdout: string; stderr: string; code: number }> {
-  return new Promise((resolve) => {
-    const proc = spawn("bun", [scriptPath, ...args], {
-      cwd: REFLEX_ROOT,
-      stdio: ["inherit", "pipe", "pipe"],
-    });
-
-    let stdout = "";
-    let stderr = "";
-
-    proc.stdout.on("data", (data) => {
-      stdout += data.toString();
-      if (verbose) process.stdout.write(data);
-    });
-
-    proc.stderr.on("data", (data) => {
-      stderr += data.toString();
-      if (verbose) process.stderr.write(data);
-    });
-
-    proc.on("close", (code) => {
-      resolve({ stdout, stderr, code: code || 0 });
-    });
-  });
+if (!existsSync(project)) {
+  console.error(`Project not found: ${project}`);
+  process.exit(1);
 }
 
-async function main() {
-  const introspectScript = `${REFLEX_ROOT}/reflex-introspect/scripts/introspect.ts`;
-  const prescribeScript = `${REFLEX_ROOT}/reflex-prescribe/scripts/prescribe.ts`;
-  const evolveScript = `${REFLEX_ROOT}/reflex-evolve/scripts/evolve.ts`;
+console.log("\n" + "=".repeat(60));
+console.log("Reflex Full Cycle");
+console.log("=".repeat(60));
+console.log(`Project: ${project}`);
+console.log(`Max cycles: ${maxCycles}`);
+console.log(`Dry run: ${dryRun}`);
+console.log("=".repeat(60) + "\n");
 
-  for (let cycle = 1; cycle <= maxCycles; cycle++) {
-    console.log("\n============================================================");
-    console.log(`⚡ CYCLE ${cycle}/${maxCycles}`);
-    console.log("============================================================\n");
+// Create temp directory for scorecards
+const tempDir = mkdtempSync(join(tmpdir(), "reflex-"));
+let cycleCount = 0;
+let improved = true;
 
-    // Step 1: Introspect
-    console.log("📊 Step 1: Introspecting...");
-    const scorecardPath = resolve(seedsDir, `scorecard-${Date.now()}.json`);
-    const introspectResult = await runScript(introspectScript, [
-      "--project", projectPath,
-      "--json",
-      "--output", scorecardPath,
-    ]);
-
-    if (introspectResult.code !== 0) {
-      console.error("❌ Introspection failed");
-      console.error(introspectResult.stderr);
-      process.exit(1);
-    }
-
-    // Parse scorecard to get composite score
-    let compositeScore = 0;
-    let weakestMetric = "";
-    try {
-      const scorecard = JSON.parse(introspectResult.stdout);
-      compositeScore = scorecard.compositeScore;
-      weakestMetric = scorecard.weakestMetric;
-      console.log(`   Composite: ${compositeScore}/100 | Weakest: ${weakestMetric}`);
-    } catch {
-      console.log("   Scorecard generated");
-    }
-
-    // Check if we're already healthy
-    if (compositeScore >= 90) {
-      console.log("\n✅ Code health is excellent (≥90). No changes needed.");
-      break;
-    }
-
-    // Step 2: Prescribe
-    console.log("\n💊 Step 2: Prescribing...");
-    const prescribeResult = await runScript(prescribeScript, [
-      "--scorecard", scorecardPath,
-      "--seeds-dir", seedsDir,
-    ]);
-
-    if (prescribeResult.code !== 0) {
-      console.error("❌ Prescription failed");
-      console.error(prescribeResult.stderr);
-      process.exit(1);
-    }
-
-    // Extract prescription path from output
-    const prescriptionMatch = prescribeResult.stdout.match(/Prescription saved to: (.+)/);
-    const prescriptionPath = prescriptionMatch ? prescriptionMatch[1].trim() : null;
-
-    if (!prescriptionPath) {
-      console.log("   No prescription generated (all metrics healthy or blocked by governor)");
-      break;
-    }
-
-    if (dryRun) {
-      console.log("\n🏃 DRY RUN: Would execute prescription:");
-      console.log(`   ${prescriptionPath}`);
-      continue;
-    }
-
-    // Step 3: Evolve
-    console.log("\n🔧 Step 3: Evolving...");
-    const evolveResult = await runScript(evolveScript, [
-      "--prescription", prescriptionPath,
-      "--project", projectPath,
-    ]);
-
-    if (evolveResult.code !== 0) {
-      console.error("❌ Evolution failed");
-      console.error(evolveResult.stderr);
-      // Continue to next cycle anyway - might be a partial fix
-    }
-
-    // Clean up scorecard
-    rmSync(scorecardPath, { force: true });
-
-    console.log("\n------------------------------------------------------------");
-    console.log(`✅ Cycle ${cycle} complete`);
-    console.log("------------------------------------------------------------");
+while (cycleCount < maxCycles && improved) {
+  cycleCount++;
+  console.log(`\n${"=".repeat(60)}`);
+  console.log(`CYCLE ${cycleCount}/${maxCycles}`);
+  console.log("=".repeat(60) + "\n");
+  
+  // Step 1: Introspect
+  console.log("--- Step 1: Introspect ---\n");
+  
+  const scorecardPath = join(tempDir, `scorecard-${cycleCount}.json`);
+  const introspectResult = runScript("reflex-introspect", "introspect.ts", [
+    "--project", project,
+    "--json",
+  ]);
+  
+  if (introspectResult.exitCode !== 0) {
+    console.error("Introspect failed:", introspectResult.stderr);
+    break;
   }
-
-  console.log("\n╔════════════════════════════════════════════════════════╗");
-  console.log("║  REFLEX FULL CYCLE COMPLETE                             ║");
-  console.log("╚════════════════════════════════════════════════════════╝\n");
+  
+  // Save scorecard
+  writeFileSync(scorecardPath, introspectResult.stdout);
+  
+  let scorecard: any;
+  try {
+    scorecard = JSON.parse(introspectResult.stdout);
+  } catch {
+    console.error("Failed to parse introspect output");
+    break;
+  }
+  
+  console.log(`Composite score: ${scorecard.composite}/100`);
+  console.log(`Weakest metric: ${scorecard.weakest}`);
+  
+  // Check if we're already at target
+  if (scorecard.composite >= 95) {
+    console.log("\nTarget score reached (95+). Stopping.");
+    improved = false;
+    break;
+  }
+  
+  // Step 2: Prescribe
+  console.log("\n--- Step 2: Prescribe ---\n");
+  
+  const prescriptionPath = join(tempDir, `prescription-${cycleCount}.json`);
+  const prescribeResult = runScript("reflex-prescribe", "prescribe.ts", [
+    "--scorecard", scorecardPath,
+    "--output", tempDir,
+    "--json",
+  ]);
+  
+  if (prescribeResult.exitCode !== 0) {
+    console.error("Prescribe failed:", prescribeResult.stderr);
+    break;
+  }
+  
+  let prescription: any;
+  try {
+    prescription = JSON.parse(prescribeResult.stdout);
+  } catch {
+    console.error("Failed to parse prescribe output");
+    break;
+  }
+  
+  console.log(`Playbook: ${prescription.playbook.id} - ${prescription.playbook.name}`);
+  console.log(`Auto-approve: ${prescription.autoApprove ? "Yes" : "No"}`);
+  
+  if (!prescription.autoApprove && !dryRun) {
+    console.log("\nGovernor: This playbook requires human approval.");
+    console.log("To execute, run:");
+    console.log(`  reflex evolve --prescription ${prescriptionPath}`);
+    improved = false;
+    break;
+  }
+  
+  // Step 3: Evolve
+  console.log("\n--- Step 3: Evolve ---\n");
+  
+  if (dryRun) {
+    console.log("Dry run: Skipping execution");
+    console.log("\nProposed steps:");
+    prescription.playbook.steps.forEach((step: string, i: number) => {
+      console.log(`  ${i + 1}. ${step}`);
+    });
+    improved = false;
+  } else {
+    const evolveResult = runScript("reflex-evolve", "evolve.ts", [
+      "--prescription", join(tempDir, `${prescription.id}.json`),
+      "--project", project,
+    ]);
+    
+    if (evolveResult.exitCode !== 0) {
+      console.error("Evolve failed:", evolveResult.stderr);
+      improved = false;
+      break;
+    }
+    
+    console.log(evolveResult.stdout);
+    
+    // Step 4: Verify (re-introspect)
+    console.log("\n--- Step 4: Verify ---\n");
+    
+    const verifyScorecardPath = join(tempDir, `scorecard-${cycleCount}-verify.json`);
+    const verifyResult = runScript("reflex-introspect", "introspect.ts", [
+      "--project", project,
+      "--json",
+    ]);
+    
+    if (verifyResult.exitCode !== 0) {
+      console.error("Verify failed:", verifyResult.stderr);
+      break;
+    }
+    
+    let verifyScorecard: any;
+    try {
+      verifyScorecard = JSON.parse(verifyResult.stdout);
+    } catch {
+      console.error("Failed to parse verify output");
+      break;
+    }
+    
+    const delta = verifyScorecard.composite - scorecard.composite;
+    
+    console.log(`Previous score: ${scorecard.composite}`);
+    console.log(`New score: ${verifyScorecard.composite}`);
+    console.log(`Delta: ${delta >= 0 ? "+" : ""}${delta}`);
+    
+    if (delta < -2) {
+      console.log("\nRegression detected (>2% drop). Reverting...");
+      improved = false;
+    } else if (delta > 0) {
+      console.log("\nImprovement confirmed. Continuing...");
+    } else {
+      console.log("\nNo change. Stopping.");
+      improved = false;
+    }
+  }
 }
 
-main().catch(console.error);
+console.log("\n" + "=".repeat(60));
+console.log("FULL CYCLE COMPLETE");
+console.log("=".repeat(60));
+console.log(`Cycles run: ${cycleCount}`);
+console.log(`Project: ${project}`);
+console.log("=".repeat(60) + "\n");
