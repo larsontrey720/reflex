@@ -12,7 +12,8 @@ import { existsSync } from "node:fs";
 const REFLEX_ROOT = dirname(dirname(import.meta.url.replace("file://", "")));
 const SKILLS_DIR = resolve(REFLEX_ROOT, "skills");
 
-const COMMANDS: Record<string, string> = {
+const COMMANDS: Record<string, CommandConfig> = {
+  // Analysis
   introspect: `${SKILLS_DIR}/reflex-introspect/scripts/introspect.ts`,
   prescribe: `${SKILLS_DIR}/reflex-prescribe/scripts/prescribe.ts`,
   evolve: `${SKILLS_DIR}/reflex-evolve/scripts/evolve.ts`,
@@ -28,6 +29,9 @@ const COMMANDS: Record<string, string> = {
   check: `${SKILLS_DIR}/reflex-introspect/scripts/introspect.ts`,
   fix: `${SKILLS_DIR}/reflex-evolve/scripts/evolve.ts`,
   ask: resolve(REFLEX_ROOT, "cli/ask.ts"),
+  simulate: `${SKILLS_DIR}/reflex-simulate/scripts/simulate.ts`,
+  memory: `${SKILLS_DIR}/reflex-memory/scripts/memory.ts`,
+  context: `${SKILLS_DIR}/reflex-context/scripts/context.ts`,
 };
 
 const help = `
@@ -49,6 +53,9 @@ Commands:
   unstuck        Get unstuck with lateral-thinking personas
   loop           Single-metric optimization loop
   full-cycle     Run complete self-enhancement cycle
+  simulate       Simulate code execution
+  memory         Manage code memory
+  context        Manage code context
 
 Options:
   --project, -p   Target project directory or GitHub URL
