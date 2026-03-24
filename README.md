@@ -46,6 +46,12 @@ Don't want to memorize CLI commands? Use the web dashboard.
 
 ---
 
+## Coming Soon — From CodeRabbit & Others
+
+Borrowing the best features
+
+---
+
 ## Ways to Import Your Code
 
 ### 1. Web Dashboard (Beginners)
