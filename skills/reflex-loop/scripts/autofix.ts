@@ -9,7 +9,7 @@ import { parseArgs } from "node:util";
 import { existsSync, readFileSync, writeFileSync, mkdirSync, rmSync } from "node:fs";
 import { resolve, dirname } from "node:path";
 import { execSync } from "node:child_process";
-import { generateFix, isConfigured, getConfig, callLLM } from "../lib/llm-client.js";
+import { generateFix, isConfigured, getConfig, callLLMWithContext, buildSystemContext } from "../lib/llm-client.js";
 
 const { values } = parseArgs({
   options: {

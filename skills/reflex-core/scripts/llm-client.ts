@@ -207,6 +207,87 @@ export function showContext(projectPath?: string): string {
   return buildSystemContext(projectPath);
 }
 
+/**
+ * Generate a fix proposal for a specific metric improvement
+ */
+export async function generateFix(
+  context: { metric: string; targetScore: number; constraints?: string[] },
+  targetFile: string,
+  currentContent: string,
+  metric: string,
+  targetScore: number
+): Promise<{
+  description: string;
+  files: Array<{
+    path: string;
+    changes: Array<{
+      type: "replace" | "insert";
+      oldContent?: string;
+      newContent: string;
+      location?: { after?: string };
+    }>;
+  }>;
+}> {
+  const prompt = `Analyze this code and generate a fix to improve the ${metric} metric from current to ${targetScore}%.
+
+Target file: ${targetFile}
+
+Current content:
+\`\`\`
+${currentContent.slice(0, 4000)}
+\`\`\`
+
+Constraints:
+${context.constraints?.map(c => `- ${c}`).join("\n") || "- No specific constraints"}
+
+Output a JSON object with:
+{
+  "description": "Brief description of the fix",
+  "files": [{
+    "path": "${targetFile}",
+    "changes": [{
+      "type": "replace",
+      "oldContent": "exact code to replace",
+      "newContent": "new code"
+    }]
+  }]
+}
+
+If the fix is an insertion, use:
+{
+  "type": "insert",
+  "location": { "after": "exact code to insert after" },
+  "newContent": "code to insert"
+}
+
+Only output valid JSON. No explanation.`;
+
+  const response = await callLLMWithContext(prompt);
+  
+  // Parse JSON from response
+  try {
+    // Try to extract JSON from response
+    const jsonMatch = response.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+      return JSON.parse(jsonMatch[0]);
+    }
+    throw new Error("No valid JSON in response");
+  } catch (e) {
+    // Return a simple proposal
+    return {
+      description: `Improve ${metric} (parsing failed)`,
+      files: [{
+        path: targetFile,
+        changes: [{
+          type: "replace",
+          oldContent: currentContent,
+          newContent: response,
+        }],
+      }],
+    };
+  }
+}
+
 // CLI interface
 if (import.meta.main) {
   const { values } = parseArgs({

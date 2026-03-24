@@ -68,7 +68,8 @@ if (!existsSync(prescriptionPath)) {
 }
 
 // Import context-aware LLM client
-import { callLLM, isConfigured, getConfig } from resolve("./reflex-core");
+import { callLLMWithContext, isConfigured, getConfig } from "../../reflex-core/scripts/llm-client.js";
+import { buildSystemContext, loadMemory, recordIncident, recordCycle } from "../../reflex-core/scripts/context.js";
 
 // Backup functions
 function createBackup(project: string, backupDir: string): string[] {
@@ -234,7 +235,7 @@ async function main() {
   console.log("║  Generating fix..." + " ".repeat(36) + "║");
 
   const prompt = generateFixPrompt(prescription, backedFiles.slice(0, prescription.governorRules?.blastRadius || 10));
-  const fixContent = await callLLM(prompt);
+  const fixContent = await callLLMWithContext(prompt);
 
   // Write fix (simplified - real version would parse and apply patches)
   const targetFile = backedFiles[0];
