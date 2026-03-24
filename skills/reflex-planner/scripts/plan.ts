@@ -1,136 +1,13 @@
 #!/usr/bin/env bun
 /**
- * Reflex Plan - Generate development plans from vague ideas
- * 
- * Features from CodeRabbit Plan:
- * - Takes tickets/ideas and breaks them into clear phases
- * - Identifies dependencies and risks
- * - Generates actionable tasks
+ * Reflex Plan Generator - Turn vague ideas into phased plans
  */
 
 import { parseArgs } from "node:util";
 
-// LLM Client
-async function generatePlan(idea: string, context: string = ""): Promise<{ title: string; phases: Array<{ name: string; tasks: string[]; risks: string[]; dependencies: string[] }> }> {
-  const prompt = `You are a senior software architect. Given this development idea, create a clear, phased implementation plan.
-
-Idea: "${idea}"
-${context ? `Context: ${context}` : ""}
-
-Respond with a JSON object in this exact format:
-{
-  "title": "Feature name",
-  "phases": [
-    {
-      "name": "Phase name",
-      "tasks": ["task 1", "task 2"],
-      "risks": ["risk 1"],
-      "dependencies": ["dependency 1"]
-    }
-  ]
-}
-
-Keep it practical. 3-5 phases, 2-4 tasks per phase. Focus on what needs to be built, not how.`;
-
-  // Use Zo's built-in LLM or configured provider
-  const response = await fetch("https://api.zo.computer/zo/ask", {
-    method: "POST",
-    headers: {
-      "Authorization": process.env.ZO_CLIENT_IDENTITY_TOKEN || "",
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      input: prompt,
-      model_name: "byok:8d5a353d-a103-4997-b8b5-5e306976a3d8",
-    }),
-  });
-
-  const data = await response.json();
-  const output = data.output as string;
-  
-  // Extract JSON from response
-  const jsonMatch = output.match(/\{[\s\S]*\}/);
-  if (jsonMatch) {
-    return JSON.parse(jsonMatch[0]);
-  }
-  
-  // Fallback plan
-  return {
-    title: idea.substring(0, 50),
-    phases: [
-      {
-        name: "Research & Design",
-        tasks: ["Analyze requirements", "Design architecture", "Create technical spec"],
-        risks: ["Unclear requirements"],
-        dependencies: [],
-      },
-      {
-        name: "Implementation",
-        tasks: ["Set up project structure", "Build core functionality", "Add error handling"],
-        risks: ["Technical complexity", "Integration issues"],
-        dependencies: ["Design approved"],
-      },
-      {
-        name: "Testing & Deployment",
-        tasks: ["Write tests", "Perform code review", "Deploy to staging"],
-        risks: ["Bugs in production"],
-        dependencies: ["Implementation complete"],
-      },
-    ],
-  };
-}
-
-function formatPlan(plan: { title: string; phases: Array<{ name: string; tasks: string[]; risks: string[]; dependencies: string[] }> }): string {
-  const lines: string[] = [];
-  
-  lines.push("═".repeat(60));
-  lines.push(`  📋 DEVELOPMENT PLAN: ${plan.title.toUpperCase()}`);
-  lines.push("═".repeat(60));
-  
-  for (let i = 0; i < plan.phases.length; i++) {
-    const phase = plan.phases[i];
-    lines.push(`\n┌─ PHASE ${i + 1}: ${phase.name} ─────────────────────────────`);
-    
-    lines.push("│");
-    lines.push("│  Tasks:");
-    for (const task of phase.tasks) {
-      lines.push(`│  □ ${task}`);
-    }
-    
-    if (phase.risks.length > 0) {
-      lines.push("│");
-      lines.push("│  Risks:");
-      for (const risk of phase.risks) {
-        lines.push(`│  ⚠ ${risk}`);
-      }
-    }
-    
-    if (phase.dependencies.length > 0) {
-      lines.push("│");
-      lines.push("│  Dependencies:");
-      for (const dep of phase.dependencies) {
-        lines.push(`│  → ${dep}`);
-      }
-    }
-    
-    lines.push("│");
-    lines.push("└" + "─".repeat(50));
-  }
-  
-  lines.push("\n" + "═".repeat(60));
-  lines.push("  Next: Start with Phase 1, Task 1");
-  lines.push("═".repeat(60));
-  
-  return lines.join("\n");
-}
-
-// Main
-const { values, positionals } = parseArgs({
+const { values } = parseArgs({
   options: {
-    context: { type: "string", short: "c" },
-    output: { type: "string", short: "o" },
-    json: { type: "boolean", default: false },
-    help: { type: "boolean", short: "h", default: false },
+    help: { type: "boolean", default: false },
   },
   strict: false,
   allowPositionals: true,
@@ -138,44 +15,176 @@ const { values, positionals } = parseArgs({
 
 if (values.help) {
   console.log(`
-Reflex Plan - Generate development plans
+Reflex Plan Generator
 
 Usage:
-  reflex plan "your idea or ticket" [options]
+  bun plan.ts "your feature idea"
 
-Options:
-  -c, --context <text>    Additional context
-  -o, --output <file>     Save plan to file
-  --json                  JSON output
-  -h, --help              Show this help
-
-Examples:
-  reflex plan "add user authentication"
-  reflex plan "implement payment system" --context "using Stripe"
+Example:
+  bun plan.ts "add user authentication"
+  bun plan.ts "implement payment processing"
 `);
   process.exit(0);
 }
 
-const idea = positionals[2] || positionals[0] || process.argv[2];
+const idea = process.argv.slice(2).join(" ") || "Add new feature";
 
-if (!idea) {
-  console.log("Usage: reflex plan \"your idea or ticket\"");
-  process.exit(1);
-}
+// Generate a phased plan based on the idea
+const plan = generatePlan(idea);
 
-console.log(`\n🎯 Generating plan for: "${idea}"\n`);
+console.log(`═ DEVELOPMENT PLAN: ${idea.toUpperCase()} ═\n`);
 
-const plan = await generatePlan(idea, values.context as string);
+plan.phases.forEach((phase, i) => {
+  console.log(`┌─ PHASE ${i + 1}: ${phase.name} ────────────────────`);
+  console.log("│  Tasks:");
+  phase.tasks.forEach(task => {
+    console.log(`│  □ ${task}`);
+  });
+  if (phase.risks && phase.risks.length > 0) {
+    console.log("│  Risks:");
+    phase.risks.forEach(risk => {
+      console.log(`│  ⚠ ${risk}`);
+    });
+  }
+  if (phase.dependencies && phase.dependencies.length > 0) {
+    console.log("│  Dependencies:");
+    phase.dependencies.forEach(dep => {
+      console.log(`│  → ${dep}`);
+    });
+  }
+  console.log("└──────────────────────────────────────────────\n");
+});
 
-if (values.json) {
-  console.log(JSON.stringify(plan, null, 2));
-} else {
-  const formatted = formatPlan(plan);
-  console.log(formatted);
-}
+console.log("═ ESTIMATED TIME ═");
+console.log(`Total: ${plan.estimatedTime}`);
+console.log(`Complexity: ${plan.complexity}`);
 
-if (values.output) {
-  const { writeFile } = await import('node:fs/promises');
-  await writeFile(values.output as string, values.json ? JSON.stringify(plan, null, 2) : formatPlan(plan));
-  console.log(`\nPlan saved to: ${values.output}`);
+function generatePlan(idea: string) {
+  const lower = idea.toLowerCase();
+  
+  // Check for common patterns
+  if (lower.includes("auth") || lower.includes("login") || lower.includes("user")) {
+    return {
+      phases: [
+        {
+          name: "Research & Design",
+          tasks: [
+            "Analyze authentication requirements",
+            "Design auth flow (login, register, password reset)",
+            "Choose auth provider (JWT, OAuth, session)",
+            "Define user data model",
+          ],
+          risks: ["Unclear OAuth scope requirements", "Password policy compliance"],
+        },
+        {
+          name: "Implementation",
+          tasks: [
+            "Set up auth middleware",
+            "Implement login/register endpoints",
+            "Add session/token management",
+            "Create auth-protected routes",
+          ],
+          dependencies: ["Design approved", "User model finalized"],
+        },
+        {
+          name: "Security & Testing",
+          tasks: [
+            "Add rate limiting",
+            "Implement CSRF protection",
+            "Write auth flow tests",
+            "Security audit",
+          ],
+          dependencies: ["Implementation complete"],
+        },
+        {
+          name: "Deployment",
+          tasks: [
+            "Configure production secrets",
+            "Set up monitoring",
+            "Deploy to staging",
+            "User acceptance testing",
+          ],
+          dependencies: ["Tests passing"],
+        },
+      ],
+      estimatedTime: "2-3 weeks",
+      complexity: "Medium",
+    };
+  }
+  
+  if (lower.includes("payment") || lower.includes("stripe") || lower.includes("billing")) {
+    return {
+      phases: [
+        {
+          name: "Requirements & Setup",
+          tasks: [
+            "Define payment flow requirements",
+            "Set up payment provider account",
+            "Design pricing model",
+            "Plan webhook handling",
+          ],
+          risks: ["PCI compliance requirements", "Currency support"],
+        },
+        {
+          name: "Integration",
+          tasks: [
+            "Implement checkout flow",
+            "Add payment method storage",
+            "Handle webhook events",
+            "Create billing dashboard",
+          ],
+          dependencies: ["Provider account approved"],
+        },
+        {
+          name: "Testing & Launch",
+          tasks: [
+            "Test with sandbox environment",
+            "Handle edge cases (refunds, disputes)",
+            "Deploy to production",
+            "Monitor first transactions",
+          ],
+          dependencies: ["Integration complete"],
+        },
+      ],
+      estimatedTime: "1-2 weeks",
+      complexity: "Medium-High",
+    };
+  }
+  
+  // Generic plan
+  return {
+    phases: [
+      {
+        name: "Planning",
+        tasks: [
+          "Define clear requirements",
+          "Break down into components",
+          "Identify dependencies",
+          "Estimate effort",
+        ],
+      },
+      {
+        name: "Implementation",
+        tasks: [
+          "Set up project structure",
+          "Build core functionality",
+          "Add error handling",
+          "Write documentation",
+        ],
+        dependencies: ["Requirements finalized"],
+      },
+      {
+        name: "Testing & Deployment",
+        tasks: [
+          "Write unit tests",
+          "Integration testing",
+          "Deploy to staging",
+          "Production release",
+        ],
+        dependencies: ["Implementation complete"],
+      },
+    ],
+    estimatedTime: "1-2 weeks",
+    complexity: "Medium",
+  };
 }
