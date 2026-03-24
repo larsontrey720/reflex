@@ -12,6 +12,46 @@ Your code fixes itself on reflex.
 
 ---
 
+
+## Quick Start
+
+### Install
+
+```bash
+# Clone
+git clone https://github.com/larsontrey720/reflex.git
+cd reflex
+
+# Install dependencies
+bun install
+
+# Link globally (enables `reflex` command everywhere)
+bun link
+```
+
+Now you can run:
+
+```bash
+reflex --help
+reflex check https://github.com/owner/repo
+reflex introspect --project ./my-app
+```
+
+### Run
+
+```bash
+# Diagnose your codebase (local)
+reflex check ./my-app
+
+# Diagnose a GitHub repo
+reflex check https://github.com/username/repo
+
+# Full self-enhancement cycle
+reflex full-cycle --project ./my-app
+```
+
+---
+
 ## The Problem
 
 Technical debt compounds silently. Every sprint, code quality degrades — type coverage slips, tests go unwritten, complexity grows, dependencies rot. By the time you notice, it's a two-week refactor nobody has time for.
@@ -19,49 +59,6 @@ Technical debt compounds silently. Every sprint, code quality degrades — type 
 Code reviews catch symptoms, not root causes. Linters flag violations but can't explain *why*. CI fails but doesn't suggest fixes.
 
 **Reflex closes the loop.** It diagnoses, prescribes, and treats — automatically.
-
----
-
-## For Beginners — No Commands Needed
-
-
-### Security Scanner
-
-Detects vulnerabilities before they reach production:
-
-```bash
-reflex security --project ./my-app
-```
-
-**Detects:**
-| Type | CVSS | Examples |
-|------|------|----------|
-| SQL Injection | 9.8 | Unparameterized queries |
-| XSS | 6.1 | innerHTML with user input |
-| RCE | 10.0 | eval(), exec() with user input |
-| Secrets | 9.1 | Hardcoded API keys, passwords |
-| SSRF | 7.5 | Fetch with user-provided URLs |
-| Path Traversal | 7.5 | readFile with user input |
-| XXE | 9.8 | Unconfigured XML parsers |
-
-**Output:**
-```
-═ REFLEX SECURITY SCAN REPORT ═
-Project: ./my-app
-Total Findings: 3
-
-🔴 CRITICAL (1)
-  [SQLI] src/db/queries.ts:42
-  CVSS: 9.8 | SQL Injection detected
-  Fix: Use parameterized queries
-
-🟠 HIGH (2)
-  [SECRETS] src/config.ts:15
-  CVSS: 9.1 | Hardcoded API key
-  Fix: Use environment variables
-
-Security Score: 94/100
-```
 
 ---
 
@@ -194,44 +191,6 @@ reflex ask "your question"       # Natural language Q&A
 
 ---
 
-## Quick Start
-
-### Install
-
-```bash
-# Clone
-git clone https://github.com/larsontrey720/reflex.git
-cd reflex
-
-# Install dependencies
-bun install
-
-# Link globally (enables `reflex` command everywhere)
-bun link
-```
-
-Now you can run:
-
-```bash
-reflex --help
-reflex check https://github.com/owner/repo
-reflex introspect --project ./my-app
-```
-
-### Run
-
-```bash
-# Diagnose your codebase (local)
-reflex check ./my-app
-
-# Diagnose a GitHub repo
-reflex check https://github.com/username/repo
-
-# Full self-enhancement cycle
-reflex full-cycle --project ./my-app
-```
-
----
 
 ## How It Works
 
