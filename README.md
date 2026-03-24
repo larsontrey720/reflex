@@ -132,6 +132,63 @@ reflex graph --question "how does auth work?"
 reflex graph --format mermaid > graph.md
 ```
 
+## PlayerZero-Inspired Features
+
+Reflex borrows key concepts from PlayerZero, the $20M-funded "Engineering World Model" platform:
+
+### Simulate — Pre-Merge Prediction
+
+Predict what breaks before you ship:
+
+```bash
+reflex simulate                    # Simulate current uncommitted changes
+reflex simulate --pr 42            # Simulate a PR before merge
+reflex simulate --json            # JSON output for CI gates
+```
+
+**Output:**
+```
+═ REFLEX SIMULATION RESULTS ═
+
+Analyzing: 3 files changed, +127/-45 lines
+
+┌─ SCENARIO RUNS ─────────────────────────────┐
+│  ✓ Happy path: User login                   │
+│  ⚠ Edge case: SSO re-auth after timeout     │
+│    → BLOCKED: Session not cleared properly  │
+│  ⚠ Edge case: Legacy config users           │
+│    → RISK: Config schema mismatch           │
+└──────────────────────────────────────────────┘
+
+RISK SCORE: 34/100 (MEDIUM)
+
+RECOMMENDATION: Fix HIGH issues before merge.
+════════════════════════════════════════════════
+```
+
+### Memory — Production Learning Loop
+
+Every resolved incident teaches the model:
+
+```bash
+reflex memory --status                      # View memory stats
+reflex memory --search "checkout failed"    # Search past incidents
+reflex memory --add "Fixed X by doing Y"    # Add resolved incident
+reflex memory --insights --files auth.ts    # Get insights for changes
+```
+
+### Context — Engineering Context Graph
+
+Connect code, tickets, PRs, decisions into one graph:
+
+```bash
+reflex context "why does checkout fail?"    # Natural language query
+reflex context --trace "auth timeout"       # Trace root cause
+reflex context --who-owns "payment-service" # Find owner
+reflex context --graph --format mermaid     # Export graph
+```
+
+
 ---
 
 ## Ways to Import Your Code
