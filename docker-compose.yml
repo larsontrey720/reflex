@@ -1,0 +1,21 @@
+services:
+  reflex:
+    build: .
+    volumes:
+      - ../:/project:ro
+    working_dir: /project
+    environment:
+      - REFLEX_LLM_PROVIDER=${REFLEX_LLM_PROVIDER:-openai}
+      - REFLEX_LLM_API_KEY=${REFLEX_LLM_API_KEY}
+    command: ["introspect", "--project", "/project"]
+    
+  # Scheduled self-enhancement loop
+  reflex-scheduled:
+    build: .
+    volumes:
+      - ../:/project
+    working_dir: /project
+    environment:
+      - REFLEX_LLM_PROVIDER=${REFLEX_LLM_PROVIDER}
+      - REFLEX_LLM_API_KEY=${REFLEX_LLM_API_KEY}
+    command: ["full-cycle", "--project", "/project", "--max-cycles", "1"]

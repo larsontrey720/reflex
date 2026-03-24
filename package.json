@@ -1,0 +1,48 @@
+{
+  "name": "reflex",
+  "version": "1.0.0",
+  "description": "Self-enhancing code quality system. Diagnoses, prescribes, fixes autonomously.",
+  "type": "module",
+  "bin": {
+    "reflex": "./cli/index.ts"
+  },
+  "scripts": {
+    "introspect": "bun run reflex-introspect/scripts/introspect.ts",
+    "prescribe": "bun run reflex-prescribe/scripts/prescribe.ts",
+    "evolve": "bun run reflex-evolve/scripts/evolve.ts",
+    "interview": "bun run reflex-interview/scripts/interview.ts",
+    "eval": "bun run reflex-eval/scripts/evaluate.ts",
+    "unstuck": "bun run reflex-unstuck/scripts/unstuck.ts",
+    "loop": "bun run reflex-loop/scripts/autofix.ts",
+    "full-cycle": "bun run cli/full-cycle.ts",
+    "test": "bun test",
+    "lint": "bun x eslint ."
+  },
+  "keywords": [
+    "code-quality",
+    "static-analysis",
+    "self-improving",
+    "autonomous",
+    "developer-tools",
+    "ai",
+    "llm",
+    "refactoring",
+    "testing",
+    "typescript"
+  ],
+  "author": "georgeo",
+  "license": "MIT",
+  "dependencies": {
+    "typescript": "^5.3.0"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "engines": {
+    "bun": ">=1.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/georgeo/reflex"
+  }
+}
