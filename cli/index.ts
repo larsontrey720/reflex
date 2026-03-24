@@ -7,11 +7,13 @@
 
 import { resolve, dirname } from "node:path";
 import { existsSync } from "node:fs";
+import { parseArgs } from "node:util";
+import { exec } from "node:child_process";
 
 // Resolve from cli/ directory to parent (where skills are)
 const REFLEX_ROOT = dirname(dirname(import.meta.path));
 
-const SKILLS_DIR = join(REFLEX_ROOT, "skills");
+const SKILLS_DIR = resolve(import.meta.dir, "..", "skills");
 
 function join(...parts: string[]) {
   return parts.reduce((acc, part) => acc + "/" + part, "").slice(1);
@@ -62,8 +64,8 @@ const COMMANDS: Record<string, { skill: string; script: string; desc: string }> 
 };
 
 // Main
-const args = process.argv.slice(2);
-const command = args[0];
+const args = parseArgs(process.argv.slice(2));
+const command = args._[0];
 
 if (!command || command === "--help" || command === "-h") {
   console.log(`
@@ -96,6 +98,39 @@ Examples:
   reflex full-cycle --project . --max 3
   reflex unstuck --problem "I keep hitting the same error"
 `);
+  process.exit(0);
+}
+
+// Natural language shortcut
+if (command === "ask") {
+  const query = args._.slice(1).join(" ");
+  if (!query) {
+    console.log('\nJust tell me what you want:\n');
+    console.log('  reflex ask "check my code"');
+    console.log('  reflex ask "fix the problems"');
+    console.log('  reflex ask "what needs work"\n');
+    process.exit(0);
+  }
+  exec(`bun ${SKILLS_DIR}/cli/ask.ts ask "${query}"`, { stdio: "inherit" });
+  process.exit(0);
+}
+
+// One-click fix shortcut
+if (command === "fix") {
+  exec(`bun ${SKILLS_DIR}/reflex-evolve/scripts/fix-it.ts`, { stdio: "inherit" });
+  process.exit(0);
+}
+
+// Setup wizard
+if (command === "setup" || command === "wizard") {
+  exec(`bun ${SKILLS_DIR}/reflex-wizard/scripts/wizard.ts`, { stdio: "inherit" });
+  process.exit(0);
+}
+
+// Plain speak mode
+if (command === "explain") {
+  const metric = args._[1] || "all";
+  exec(`bun ${SKILLS_DIR}/reflex-introspect/scripts/plain-speak.ts --metric ${metric}`, { stdio: "inherit" });
   process.exit(0);
 }
 

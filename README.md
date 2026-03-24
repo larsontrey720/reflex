@@ -20,6 +20,74 @@ Code reviews catch symptoms, not root causes. Linters flag violations but can't 
 
 ---
 
+## For Beginners — No Commands Needed
+
+Don't want to memorize commands? You don't have to.
+
+### Natural Language Mode
+
+Just say what you want:
+
+```bash
+reflex ask "check my code"
+reflex ask "fix the problems"
+reflex ask "what needs work"
+reflex ask "explain type integrity"
+reflex ask "how do I improve tests"
+```
+
+Reflex understands plain English. No flags, no syntax, just talk to it.
+
+### One-Click Fix
+
+```bash
+reflex fix
+```
+
+That's it. Analyzes your code, finds issues, fixes them automatically. Safe mode by default — won't break anything.
+
+### Setup Wizard
+
+First time? Run the wizard:
+
+```bash
+reflex setup
+```
+
+It will:
+- Detect your project type
+- Ask what you care about
+- Configure everything automatically
+- Run your first analysis
+
+### Web Dashboard
+
+See your code health visually:
+
+**https://georgeo.zo.space/reflex**
+
+- Color-coded metrics (green/yellow/red)
+- Plain English explanations
+- Click to learn more
+- One-click fix button
+
+No terminal needed.
+
+### Plain English Explanations
+
+Every metric explained in simple terms:
+
+```bash
+reflex explain tests
+
+# What it means: How much of your code runs during tests.
+# Why it matters: Untested code might have bugs you don't know about.
+# Common issues: Missing tests for utility functions, uncovered branches.
+# How to improve: Write tests for each function, test error paths too.
+```
+
+---
+
 ## Quick Start
 
 ### Install
