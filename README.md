@@ -1,5 +1,9 @@
 # Reflex
 
+[![npm version](https://img.shields.io/npm/v/reflex-code.svg)](https://www.npmjs.com/package/reflex-code)
+[![npm downloads](https://img.shields.io/npm/dm/reflex-code.svg)](https://www.npmjs.com/package/reflex-code)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 **Your code's reflex. Quality on automatic.**
 
 Reflex is a self-enhancing code quality system. It measures 10 code health metrics, identifies the weakest area, generates a remediation plan from 17 playbooks, executes fixes autonomously, and verifies the results.
