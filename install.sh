@@ -10,8 +10,21 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m'
 
-echo -e "${GREEN}⚡ Reflex Installer${NC}"
-echo "=============================="
+echo ""
+echo -e "${GREEN}"
+cat << 'LOGO'
+    ╭━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╮
+    ┃   ██████╗ ███████╗██╗   ██╗  ┃
+    ┃   ██╔══██╗██╔════╝██║   ██║  ┃
+    ┃   ██████╔╝█████╗  ██║   ██║  ┃
+    ┃   ██╔══██╗██╔══╝  ██║   ██║  ┃
+    ┃   ██║  ██║███████╗╚██████╔╝  ┃
+    ┃   ╚═╝  ╚═╝╚══════╝ ╚═════╝   ┃
+    ┃                              ┃
+    ┃   🐆 Your code's reflex       ┃
+    ╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯
+LOGO
+echo -e "${NC}"
 echo ""
 
 # Detect environment
@@ -38,6 +51,12 @@ SKILLS=(
   "reflex-eval"
   "reflex-unstuck"
   "reflex-loop"
+  "reflex-security"
+  "reflex-planner"
+  "reflex-simulate"
+  "reflex-memory"
+  "reflex-context"
+  "reflex-wizard"
 )
 
 for skill in "${SKILLS[@]}"; do
@@ -51,16 +70,20 @@ done
 cp -r cli "$SKILLS_DIR/" 2>/dev/null || true
 cp reflex.config.ts "$SKILLS_DIR/" 2>/dev/null || true
 cp package.json "$SKILLS_DIR/" 2>/dev/null || true
+cp reflex-logo.svg "$SKILLS_DIR/" 2>/dev/null || true
 
 echo ""
 echo -e "${GREEN}Installation complete!${NC}"
 echo ""
 echo "Quick start:"
 echo "  cd $SKILLS_DIR"
-echo "  bun cli/index.ts introspect --project /path/to/your/app"
+echo "  bun cli/index.ts --help"
+echo "  bun cli/index.ts check --project /path/to/app"
 echo ""
 echo "LLM configuration:"
 echo "  export REFLEX_LLM_PROVIDER=openai    # or anthropic, ollama, zo"
 echo "  export REFLEX_LLM_API_KEY=sk-..."
 echo ""
-echo "Or set up as a scheduled agent in Zo Computer for weekly checks."
+echo "GitHub URL support:"
+echo "  bun cli/index.ts check https://github.com/user/repo"
+echo ""

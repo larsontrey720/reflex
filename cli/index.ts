@@ -12,6 +12,19 @@ import { existsSync } from "node:fs";
 const REFLEX_ROOT = dirname(dirname(import.meta.url.replace("file://", "")));
 const SKILLS_DIR = resolve(REFLEX_ROOT, "skills");
 
+const LOGO = `
+    ╭━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╮
+    ┃   ██████╗ ███████╗██╗   ██╗  ┃
+    ┃   ██╔══██╗██╔════╝██║   ██║  ┃
+    ┃   ██████╔╝█████╗  ██║   ██║  ┃
+    ┃   ██╔══██╗██╔══╝  ██║   ██║  ┃
+    ┃   ██║  ██║███████╗╚██████╔╝  ┃
+    ┃   ╚═╝  ╚═╝╚══════╝ ╚═════╝   ┃
+    ┃                              ┃
+    ┃   🐆 Your code's reflex       ┃
+    ╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯
+`;
+
 const COMMANDS: Record<string, CommandConfig> = {
   // Analysis
   introspect: `${SKILLS_DIR}/reflex-introspect/scripts/introspect.ts`,
@@ -36,7 +49,8 @@ const COMMANDS: Record<string, CommandConfig> = {
   context: `${SKILLS_DIR}/reflex-context/scripts/context.ts`,
 };
 
-const help = `
+const help = LOGO + `
+
 ⚡ Reflex - Your code's reflex
 
 Usage:
