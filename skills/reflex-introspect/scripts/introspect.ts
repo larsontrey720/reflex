@@ -22,6 +22,12 @@ const { values } = parseArgs({
   strict: false,
 });
 
+// Extract values early so they're available for all code
+const outputJson = values.json as boolean;
+const targetMetric = values.metric as string | undefined;
+const outputPath = values.output as string | undefined;
+const verbose = values.verbose as boolean;
+
 if (values.help) {
   console.log(`
 Reflex Introspect - Your code's pulse check
@@ -63,8 +69,8 @@ let tempDir: string | null = null;
 
 if (projectArg.includes('github.com') || projectArg.match(/^[\w-]+\/[\w-]+$/)) {
   // It's a GitHub URL or shorthand
-  console.log(`Analyzing project: ${projectArg}`);
-  console.error('Fetching from GitHub...');
+  if (!outputJson) console.log(`Analyzing project: ${projectArg}`);
+  if (!outputJson) console.error('Fetching from GitHub...');
   
   let owner: string, repo: string;
   
@@ -102,10 +108,7 @@ if (projectArg.includes('github.com') || projectArg.match(/^[\w-]+\/[\w-]+$/)) {
 }
 
 const projectPath = resolve(projectArg);
-const targetMetric = values.metric as string | undefined;
-const outputJson = values.json as boolean;
-const outputPath = values.output as string | undefined;
-const verbose = values.verbose as boolean;
+
 
 // Metric thresholds
 const THRESHOLDS: Record<string, { target: number; weight: number; warning: number; critical: number }> = {
@@ -261,7 +264,7 @@ function calculateScore(metric: string, value: number, threshold: typeof THRESHO
 // Main
 async function main() {
   if (!outputJson) {
-    console.log("Analyzing project: " + projectPath);
+    if (!outputJson) console.log("Analyzing project: " + projectPath);
   }
 
   const metrics = [];

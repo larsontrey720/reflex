@@ -15,6 +15,7 @@ const { values } = parseArgs({
     prescription: { type: "string" },
     project: { type: "string", default: process.cwd() },
     "dry-run": { type: "boolean", default: false },
+    approve: { type: "boolean", default: false },
     verbose: { type: "boolean", default: false },
     help: { type: "boolean", short: "h", default: false },
   },
@@ -32,6 +33,7 @@ Options:
   --prescription <file>    Path to prescription JSON
   -p, --project <dir>      Target project (default: current directory)
   --dry-run                Show what would be done without executing
+  --approve                Override governor and proceed with execution
   --verbose                Show detailed output
   -h, --help               Show this help
 
@@ -209,11 +211,16 @@ async function main() {
   console.log("╠════════════════════════════════════════════════════════╣");
 
   // Check governor
-  if (!prescription.autoApprove) {
+  const forceApprove = values.approve as boolean;
+  if (!prescription.autoApprove && !forceApprove) {
     console.log("║  ⚠️  GOVERNOR: This prescription requires approval      ║");
     console.log("║  Run with --approve to proceed, or review manually     ║");
     console.log("╚════════════════════════════════════════════════════════╝");
     process.exit(0);
+  }
+  
+  if (forceApprove && !prescription.autoApprove) {
+    console.log("║  ⚡ GOVERNOR OVERRIDE: User approved execution         ║");
   }
 
   if (dryRun) {
