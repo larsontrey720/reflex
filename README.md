@@ -28,7 +28,7 @@ npm install -g reflex-code
 Or with Bun:
 
 ```bash
-bun install -g reflex
+bun install -g reflex-code
 ```
 
 ### Run
