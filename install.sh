@@ -1,8 +1,19 @@
 #!/bin/bash
 # Reflex Installer
-# Installs Reflex skills to your Zo Computer or any Bun environment
 
 set -e
+
+echo ""
+echo "    ╔══════════════════════════════╗"
+echo "    ║  ██████╗ ███████╗██████╗     ║"
+echo "    ║  ██╔══██╗██╔════╝██╔══██╗    ║"
+echo "    ║  ██████╔╝█████╗  ██║  ██║    ║"
+echo "    ║  ██╔══██╗██╔══╝  ██║  ██║    ║"
+echo "    ║  ██║  ██║███████╗██████╔╝    ║"
+echo "    ║  ╚═╝  ╚═╝╚══════╝╚═════╝     ║"
+echo "    ║     Your code's reflex       ║"
+echo "    ╚══════════════════════════════╝"
+echo ""
 
 # Colors
 RED='\033[0;31m'
@@ -10,21 +21,8 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m'
 
-echo ""
-echo -e "${GREEN}"
-cat << 'LOGO'
-    ╭━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╮
-    ┃   ██████╗ ███████╗██╗   ██╗  ┃
-    ┃   ██╔══██╗██╔════╝██║   ██║  ┃
-    ┃   ██████╔╝█████╗  ██║   ██║  ┃
-    ┃   ██╔══██╗██╔══╝  ██║   ██║  ┃
-    ┃   ██║  ██║███████╗╚██████╔╝  ┃
-    ┃   ╚═╝  ╚═╝╚══════╝ ╚═════╝   ┃
-    ┃                              ┃
-    ┃   🐆 Your code's reflex       ┃
-    ╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯
-LOGO
-echo -e "${NC}"
+echo -e "${GREEN}Reflex Installer${NC}"
+echo "=============================="
 echo ""
 
 # Detect environment
@@ -62,7 +60,7 @@ SKILLS=(
 for skill in "${SKILLS[@]}"; do
   if [ -d "$skill" ]; then
     cp -r "$skill" "$SKILLS_DIR/"
-    echo "  ✅ $skill"
+    echo "  [OK] $skill"
   fi
 done
 
@@ -86,4 +84,3 @@ echo "  export REFLEX_LLM_API_KEY=sk-..."
 echo ""
 echo "GitHub URL support:"
 echo "  bun cli/index.ts check https://github.com/user/repo"
-echo ""
