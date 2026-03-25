@@ -13,15 +13,12 @@ const REFLEX_ROOT = dirname(dirname(import.meta.url.replace("file://", "")));
 const SKILLS_DIR = resolve(REFLEX_ROOT, "skills");
 
 const LOGO = `
-    ╔══════════════════════════════╗
-    ║  ██████╗ ███████╗██████╗     ║
-    ║  ██╔══██╗██╔════╝██╔══██╗    ║
-    ║  ██████╔╝█████╗  ██║  ██║    ║
-    ║  ██╔══██╗██╔══╝  ██║  ██║    ║
-    ║  ██║  ██║███████╗██████╔╝    ║
-    ║  ╚═╝  ╚═╝╚══════╝╚═════╝     ║
-    ║     Your code's reflex       ║
-    ╚══════════════════════════════╝
+   ╭─────────────────────────────╮
+   │                             │
+   │          R E F L E X        │
+   │                             │
+   │      Your code's reflex     │
+   ╰─────────────────────────────╯
 `;
 
 const COMMANDS: Record<string, CommandConfig> = {
