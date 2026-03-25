@@ -13,15 +13,15 @@ const REFLEX_ROOT = dirname(dirname(import.meta.url.replace("file://", "")));
 const SKILLS_DIR = resolve(REFLEX_ROOT, "skills");
 
 const LOGO = `
-   ╭─────────────────────────────╮
-   │                             │
-   │          R E F L E X        │
-   │                             │
-   │      Your code's reflex     │
-   ╰─────────────────────────────╯
+██████╗ ███████╗███████╗██╗     ███████╗██╗  ██╗
+██╔══██╗██╔════╝██╔════╝██║     ██╔════╝╚██╗██╔╝
+██████╔╝█████╗  █████╗  ██║     █████╗   ╚███╔╝ 
+██╔══██╗██╔══╝  ██╔══╝  ██║     ██╔══╝   ██╔██╗ 
+██║  ██║███████╗██║     ███████╗███████╗██╔╝ ██╗
+╚═╝  ╚═╝╚══════╝╚═╝     ╚══════╝╚══════╝╚═╝  ╚═╝
 `;
 
-const COMMANDS: Record<string, CommandConfig> = {
+const COMMANDS: Record<string, string> = {
   // Analysis
   introspect: `${SKILLS_DIR}/reflex-introspect/scripts/introspect.ts`,
   prescribe: `${SKILLS_DIR}/reflex-prescribe/scripts/prescribe.ts`,
@@ -46,8 +46,7 @@ const COMMANDS: Record<string, CommandConfig> = {
 };
 
 const help = LOGO + `
-
-⚡ Reflex - Your code's reflex
+Your code's reflex. Quality on automatic.
 
 Usage:
   reflex <command> [options]
@@ -109,13 +108,13 @@ async function main() {
   const scriptPath = COMMANDS[command];
 
   if (!scriptPath) {
-    console.error(`Unknown command: ${command}`);
+    console.error("Unknown command: " + command);
     console.log("\nAvailable commands:", Object.keys(COMMANDS).join(", "));
     process.exit(1);
   }
 
   if (!existsSync(scriptPath)) {
-    console.error(`Script not found: ${scriptPath}`);
+    console.error("Script not found: " + scriptPath);
     console.log("\nMake sure you're running from the reflex directory.");
     console.log("Try: bun run cli/index.ts <command>");
     process.exit(1);
@@ -124,8 +123,8 @@ async function main() {
   // Handle bare arguments for check/introspect commands
   // If it's a GitHub URL or path without --project flag, add the flag
   let scriptArgs = args.slice(1);
-  if ((command === 'check' || command === 'introspect') && scriptArgs.length > 0 && !scriptArgs[0].startsWith('-')) {
-    scriptArgs = ['--project', scriptArgs[0], ...scriptArgs.slice(1)];
+  if ((command === "check" || command === "introspect") && scriptArgs.length > 0 && !scriptArgs[0].startsWith("-")) {
+    scriptArgs = ["--project", scriptArgs[0], ...scriptArgs.slice(1)];
   }
   
   // Pass args to the script
