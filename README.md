@@ -18,7 +18,7 @@ Your code fixes itself on reflex.
 ### Install
 
 ```bash
-npm install -g reflex
+npm install -g reflex-quality
 ```
 
 Or with Bun:
