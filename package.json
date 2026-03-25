@@ -1,6 +1,6 @@
 {
   "name": "reflex-code",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Your code's reflex. Self-enhancing code quality system that diagnoses, prescribes, and fixes autonomously.",
   "type": "module",
   "bin": {
