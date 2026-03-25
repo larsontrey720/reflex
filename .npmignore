@@ -1,0 +1,19 @@
+# Development files
+.git/
+.github/
+.gitignore
+.DS_Store
+
+# Test files
+**/*.test.ts
+**/*.spec.ts
+
+# Development configs
+.eslintrc*
+.prettierrc*
+tsconfig.json
+
+# Misc
+*.log
+*.tgz
+node_modules/

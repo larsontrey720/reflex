@@ -1,13 +1,22 @@
 {
   "name": "reflex",
   "version": "1.0.0",
-  "description": "Self-enhancing code quality system. Diagnoses, prescribes, fixes autonomously.",
+  "description": "Your code's reflex. Self-enhancing code quality system that diagnoses, prescribes, and fixes autonomously.",
   "type": "module",
   "bin": {
     "reflex": "./cli/index.ts"
   },
+  "main": "./cli/index.ts",
+  "files": [
+    "cli/",
+    "skills/",
+    "reflex.config.ts",
+    "reflex-logo.svg",
+    "LICENSE",
+    "README.md"
+  ],
   "scripts": {
-    "preinstall": "bun --version || echo 'Bun required: bun.sh'",
+    "preinstall": "bun --version || echo 'Bun required: install from bun.sh'",
     "introspect": "bun run skills/reflex-introspect/scripts/introspect.ts",
     "prescribe": "bun run skills/reflex-prescribe/scripts/prescribe.ts",
     "evolve": "bun run skills/reflex-evolve/scripts/evolve.ts",
@@ -20,10 +29,10 @@
     "fix": "bun run cli/index.ts fix",
     "security": "bun run cli/index.ts security",
     "plan": "bun run cli/index.ts plan",
-    "test": "bun test",
-    "lint": "bun x eslint ."
+    "test": "bun test"
   },
   "keywords": [
+    "reflex",
     "code-quality",
     "static-analysis",
     "self-improving",
@@ -33,10 +42,22 @@
     "llm",
     "refactoring",
     "testing",
-    "typescript"
+    "typescript",
+    "cli",
+    "code-analysis",
+    "bug-detection",
+    "security-scanner"
   ],
-  "author": "georgeo",
+  "author": "larsontrey720",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/larsontrey720/reflex.git"
+  },
+  "homepage": "https://github.com/larsontrey720/reflex#readme",
+  "bugs": {
+    "url": "https://github.com/larsontrey720/reflex/issues"
+  },
   "dependencies": {
     "typescript": "^5.3.0"
   },
@@ -46,8 +67,5 @@
   "engines": {
     "bun": ">=1.0.0"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/georgeo/reflex"
-  }
+  "packageManager": "bun@1.0.0"
 }

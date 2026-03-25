@@ -15,38 +15,26 @@ Your code fixes itself on reflex.
 
 ## Quick Start
 
-**Works on Windows, Mac, and Linux.** Only requirement: [Bun](https://bun.sh) runtime.
-
 ### Install
 
 ```bash
-# Clone
-git clone https://github.com/larsontrey720/reflex.git
-cd reflex
-
-# Install dependencies
-bun install
-
-# Link globally (enables `reflex` command everywhere)
-bun link
+npm install -g reflex
 ```
 
-Now you can run:
+Or with Bun:
 
 ```bash
-reflex --help
-reflex check https://github.com/owner/repo
-reflex introspect --project ./my-app
+bun install -g reflex
 ```
 
 ### Run
 
 ```bash
-# Diagnose your codebase (local)
-reflex check ./my-app
+# Diagnose your codebase
+reflex introspect --project ./my-app
 
 # Diagnose a GitHub repo
-reflex check https://github.com/username/repo
+reflex introspect --project https://github.com/owner/repo
 
 # Full self-enhancement cycle
 reflex full-cycle --project ./my-app
